@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Dashboard - Slim</title>
     <style>
+        /* CSS Variables - Supports Light & Dark Themes */
         :root {
             --bg-color: #0b0b0d;
             --widget-bg: #161619;
@@ -13,9 +14,22 @@
             --text-primary: #ffffff;
             --text-secondary: #999999;
             --text-accent: #666666;
+            --border-color: #333333;
             --border-radius: 24px;
             --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             --accent-color: #ff5e3a;
+        }
+
+        /* Light Theme Overrides */
+        body.light-theme {
+            --bg-color: #f2f2f7;
+            --widget-bg: #ffffff;
+            --task-bg: #e5e5ea;
+            --modal-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --text-accent: #8e8e93;
+            --border-color: #d1d1d6;
         }
 
         * {
@@ -31,6 +45,7 @@
             padding: 24px 16px;
             display: flex;
             justify-content: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -62,7 +77,7 @@
             letter-spacing: -0.5px;
         }
 
-        /* 3D Gear Icon Styles */
+        /* 3D Gear Icon */
         .gear-icon {
             width: 48px;
             height: 48px;
@@ -73,8 +88,7 @@
         }
 
         .gear-icon svg {
-            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.9)) 
-                    drop-shadow(-1px -1px 3px rgba(255, 255, 255, 0.15));
+            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.4));
             transition: transform 0.2s ease;
         }
 
@@ -94,6 +108,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s ease;
         }
 
         .widget-label {
@@ -149,7 +164,77 @@
             height: 90px;
         }
 
-        /* Schedule Block Styling */
+        /* Calendar Styling */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .calendar-month-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            text-align: center;
+        }
+
+        .cal-day-name {
+            font-size: 11px;
+            color: var(--text-accent);
+            font-weight: 600;
+            padding-bottom: 4px;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-size: 13px;
+            cursor: pointer;
+            position: relative;
+            color: var(--text-primary);
+        }
+
+        .cal-day:hover {
+            background-color: var(--task-bg);
+        }
+
+        .cal-day.today {
+            border: 1px solid var(--accent-color);
+            font-weight: bold;
+        }
+
+        .cal-day.selected {
+            background-color: var(--accent-color) !important;
+            color: #ffffff !important;
+        }
+
+        .cal-day.has-event::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 3px;
+        }
+
+        /* Schedule Styling */
         .schedule-header {
             display: flex;
             justify-content: space-between;
@@ -158,9 +243,9 @@
         }
 
         .btn-small {
-            background-color: #2a2a30;
+            background-color: var(--task-bg);
             color: var(--text-secondary);
-            border: 1px solid #444;
+            border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 4px 12px;
             font-size: 12px;
@@ -202,7 +287,7 @@
             cursor: pointer;
         }
 
-        /* Task Section & Filters */
+        /* Tasks Styling */
         .tasks-header {
             display: flex;
             justify-content: space-between;
@@ -227,7 +312,7 @@
         }
 
         .filter-btn.active {
-            background-color: #2a2a30;
+            background-color: var(--task-bg);
             color: var(--text-primary);
         }
 
@@ -258,7 +343,7 @@
         .task-checkbox {
             width: 22px;
             height: 22px;
-            border: 2px solid #666;
+            border: 2px solid var(--text-accent);
             border-radius: 50%;
             background-color: transparent;
             cursor: pointer;
@@ -297,7 +382,7 @@
         .task-delete {
             background: none;
             border: none;
-            color: #666;
+            color: var(--text-accent);
             font-size: 18px;
             padding: 0 4px;
             cursor: pointer;
@@ -309,8 +394,8 @@
         }
 
         .task-item.completed .task-checkbox {
-            border-color: #444;
-            background-color: #444;
+            border-color: var(--text-accent);
+            background-color: var(--text-accent);
         }
 
         /* Modal / Sheet Overlay */
@@ -370,12 +455,19 @@
 
         .form-input, .form-select {
             background-color: var(--task-bg);
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 12px;
             color: var(--text-primary);
             font-size: 15px;
             outline: none;
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
         }
 
         .modal-buttons {
@@ -386,8 +478,8 @@
 
         .btn-primary {
             flex: 1;
-            background-color: #ffffff;
-            color: #000000;
+            background-color: var(--text-primary);
+            color: var(--bg-color);
             border: none;
             border-radius: 14px;
             padding: 12px;
@@ -397,7 +489,7 @@
 
         .btn-secondary {
             flex: 1;
-            background-color: #2a2a30;
+            background-color: var(--task-bg);
             color: var(--text-primary);
             border: none;
             border-radius: 14px;
@@ -414,9 +506,8 @@
             <div id="greeting-time">Good evening</div>
             <h1 id="user-name">Slim</h1>
         </div>
-        <!-- 3D Gear Icon opens Settings -->
         <div class="gear-icon" onclick="openSettingsModal()">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="#e0e0e0" xmlns="http://www.w3.org/2000/svg">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
             </svg>
         </div>
@@ -436,7 +527,28 @@
         </div>
     </div>
 
-    <!-- Time Slot Schedule Widget -->
+    <!-- Calendar Widget -->
+    <div class="widget">
+        <div class="calendar-header">
+            <div class="calendar-month-title" id="cal-month-year">July 2026</div>
+            <div class="calendar-nav">
+                <button class="btn-small" onclick="prevMonth()">&lt;</button>
+                <button class="btn-small" onclick="nextMonth()">&gt;</button>
+            </div>
+        </div>
+        <div class="cal-grid">
+            <div class="cal-day-name">S</div>
+            <div class="cal-day-name">M</div>
+            <div class="cal-day-name">T</div>
+            <div class="cal-day-name">W</div>
+            <div class="cal-day-name">T</div>
+            <div class="cal-day-name">F</div>
+            <div class="cal-day-name">S</div>
+        </div>
+        <div class="cal-grid" id="cal-days-grid" style="margin-top: 6px;"></div>
+    </div>
+
+    <!-- Schedule Widget -->
     <div class="widget">
         <div class="schedule-header">
             <div class="widget-label" style="margin:0;">Today's Schedule</div>
@@ -445,7 +557,7 @@
         <div class="schedule-list" id="schedule-list"></div>
     </div>
 
-    <!-- Tasks Widget with Filtering -->
+    <!-- Tasks Widget -->
     <div class="widget">
         <div class="tasks-header">
             <div class="widget-label" style="margin:0;">Today's Tasks</div>
@@ -457,6 +569,22 @@
             <button class="filter-btn" onclick="setFilter('completed', this)">Done</button>
         </div>
         <ul id="task-list"></ul>
+    </div>
+</div>
+
+<!-- Calendar Event Modal -->
+<div class="modal-overlay" id="event-modal">
+    <div class="modal">
+        <h3 class="modal-title" id="event-modal-title">Date Events</h3>
+        <div id="existing-events-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:8px;"></div>
+        <div class="form-group">
+            <label>Add Important Day / Event</label>
+            <input type="text" id="event-title-input" class="form-input" placeholder="e.g. Birthday, Launch, Exam">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('event-modal')">Close</button>
+            <button class="btn-primary" onclick="saveCalendarEvent()">Save Event</button>
+        </div>
     </div>
 </div>
 
@@ -504,6 +632,10 @@
             <label>Current Streak (Days)</label>
             <input type="number" id="setting-streak-input" class="form-input">
         </div>
+        <div class="toggle-row">
+            <span>Theme Mode</span>
+            <button class="btn-small" id="theme-toggle-btn" onclick="toggleTheme()">Dark Theme</button>
+        </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
             <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
@@ -513,22 +645,43 @@
 
 <script>
     function getData() {
-        const data = localStorage.getItem('slimDataV3');
+        const data = localStorage.getItem('slimDataV4');
         return data ? JSON.parse(data) : { 
             userName: 'Slim',
             streak: 0,
+            theme: 'dark',
             verse: '', 
+            events: {}, // Format: { "YYYY-MM-DD": ["Event 1", "Event 2"] }
             schedule: [{ time: '09:00 AM', text: 'Morning Focus' }], 
             tasks: [{ id: 1, title: 'Build app interface', category: 'Work', priority: 'high', completed: false }] 
         };
     }
 
     function saveData(data) {
-        localStorage.setItem('slimDataV3', JSON.stringify(data));
+        localStorage.setItem('slimDataV4', JSON.stringify(data));
     }
 
     const appData = getData();
     let currentFilter = 'all';
+    let calDate = new Date();
+    let selectedDateKey = '';
+
+    // Apply Theme
+    function applyTheme() {
+        if (appData.theme === 'light') {
+            document.body.classList.add('light-theme');
+            document.getElementById('theme-toggle-btn').textContent = 'Light Theme';
+        } else {
+            document.body.classList.remove('light-theme');
+            document.getElementById('theme-toggle-btn').textContent = 'Dark Theme';
+        }
+    }
+
+    function toggleTheme() {
+        appData.theme = appData.theme === 'light' ? 'dark' : 'light';
+        applyTheme();
+        saveData(appData);
+    }
 
     function updateHeader() {
         const now = new Date();
@@ -548,11 +701,99 @@
 
     // Verse Input
     const verseInput = document.getElementById('verse-input');
-    verseInput.value = appData.verse;
+    verseInput.value = appData.verse || '';
     verseInput.addEventListener('input', () => {
         appData.verse = verseInput.value;
         saveData(appData);
     });
+
+    // Calendar System
+    function renderCalendar() {
+        const year = calDate.getFullYear();
+        const month = calDate.getMonth();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
+        
+        const grid = document.getElementById('cal-days-grid');
+        grid.innerHTML = '';
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        // Empty slots for alignment
+        for (let i = 0; i < firstDay; i++) {
+            grid.appendChild(document.createElement('div'));
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'cal-day';
+            dayEl.textContent = day;
+
+            const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
+                dayEl.classList.add('today');
+            }
+
+            if (appData.events && appData.events[dateKey] && appData.events[dateKey].length > 0) {
+                dayEl.classList.add('has-event');
+            }
+
+            dayEl.onclick = () => openCalendarEventModal(dateKey, day, monthNames[month], year);
+            grid.appendChild(dayEl);
+        }
+    }
+
+    function prevMonth() { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
+    function nextMonth() { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
+
+    function openCalendarEventModal(dateKey, day, monthName, year) {
+        selectedDateKey = dateKey;
+        document.getElementById('event-modal-title').textContent = `${monthName} ${day}, ${year}`;
+        
+        const list = document.getElementById('existing-events-list');
+        list.innerHTML = '';
+
+        const existingEvents = (appData.events && appData.events[dateKey]) || [];
+        if (existingEvents.length === 0) {
+            list.innerHTML = '<div style="font-size:13px; color:var(--text-accent);">No events for this day.</div>';
+        } else {
+            existingEvents.forEach((ev, idx) => {
+                const item = document.createElement('div');
+                item.className = 'schedule-item';
+                item.innerHTML = `<span class="schedule-text">${ev}</span><button class="schedule-delete" onclick="deleteCalendarEvent(${idx})">&times;</button>`;
+                list.appendChild(item);
+            });
+        }
+
+        document.getElementById('event-title-input').value = '';
+        document.getElementById('event-modal').classList.add('open');
+    }
+
+    function saveCalendarEvent() {
+        const text = document.getElementById('event-title-input').value.trim();
+        if (text) {
+            if (!appData.events) appData.events = {};
+            if (!appData.events[selectedDateKey]) appData.events[selectedDateKey] = [];
+            appData.events[selectedDateKey].push(text);
+            saveData(appData);
+            renderCalendar();
+            closeModal('event-modal');
+        }
+    }
+
+    function deleteCalendarEvent(index) {
+        if (appData.events && appData.events[selectedDateKey]) {
+            appData.events[selectedDateKey].splice(index, 1);
+            if (appData.events[selectedDateKey].length === 0) delete appData.events[selectedDateKey];
+            saveData(appData);
+            renderCalendar();
+            closeModal('event-modal');
+        }
+    }
 
     // Schedule System
     function renderSchedule() {
@@ -591,7 +832,7 @@
         renderSchedule();
     }
 
-    // Task Management System
+    // Task System
     function setFilter(filter, btn) {
         currentFilter = filter;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -630,9 +871,7 @@
         });
     }
 
-    function openAddTaskModal() {
-        document.getElementById('task-modal').classList.add('open');
-    }
+    function openAddTaskModal() { document.getElementById('task-modal').classList.add('open'); }
 
     function saveNewTask() {
         const title = document.getElementById('task-title-input').value.trim();
@@ -650,15 +889,7 @@
 
     function toggleTask(index) {
         appData.tasks[index].completed = !appData.tasks[index].completed;
-        
-        // Auto-streak calculation check
-        const allDone = appData.tasks.length > 0 && appData.tasks.every(t => t.completed);
-        if (allDone) {
-            appData.streak = (appData.streak || 0) + 1;
-        }
-
         saveData(appData);
-        updateHeader();
         renderTasks();
     }
 
@@ -668,10 +899,7 @@
         renderTasks();
     }
 
-    // Modal Helpers
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('open');
-    }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
     function openSettingsModal() {
         document.getElementById('setting-name-input').value = appData.userName || 'Slim';
@@ -691,7 +919,10 @@
         closeModal('settings-modal');
     }
 
+    // Initialize
+    applyTheme();
     updateHeader();
+    renderCalendar();
     renderSchedule();
     renderTasks();
 </script>
