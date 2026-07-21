@@ -117,7 +117,8 @@
             font-size: 14px;
         }
 
-        #focus-input {
+        /* Shared Input Styles for Verse and Schedule */
+        .text-input {
             width: 100%;
             border: none;
             background: transparent;
@@ -128,18 +129,20 @@
             padding: 0;
             margin-top: 4px;
             line-height: 1.4;
-            height: 90px;
             font-family: inherit;
         }
 
-        #focus-input:focus {
+        .text-input:focus {
             outline: none;
             color: var(--text-primary);
         }
 
-        .schedule-status {
-            color: var(--text-secondary);
-            font-size: 15px;
+        #verse-input {
+            height: 90px;
+        }
+
+        #schedule-input {
+            height: 60px;
         }
 
         .tasks-header {
@@ -253,14 +256,14 @@
         </div>
 
         <div class="widget">
-            <div class="widget-label">Today's Focus</div>
-            <textarea id="focus-input" placeholder="what's the plan..."></textarea>
+            <div class="widget-label">The Week's Verse</div>
+            <textarea id="verse-input" class="text-input" placeholder="Enter verse..."></textarea>
         </div>
     </div>
 
     <div class="widget">
         <div class="widget-label">Today's Schedule</div>
-        <div class="schedule-status">done for today 🎉</div>
+        <textarea id="schedule-input" class="text-input" placeholder="What's on the agenda?"></textarea>
     </div>
 
     <div class="widget">
@@ -274,12 +277,16 @@
 
 <script>
     function getData() {
-        const data = localStorage.getItem('slimData');
-        return data ? JSON.parse(data) : { focus: '', tasks: [{ id: 1, title: 'Buy car', category: 'Other', priority: 'high', completed: false }] };
+        const data = localStorage.getItem('slimDataV2'); // Updated storage key for new structure
+        return data ? JSON.parse(data) : { 
+            verse: '', 
+            schedule: '', 
+            tasks: [{ id: 1, title: 'Buy car', category: 'Other', priority: 'high', completed: false }] 
+        };
     }
 
     function saveData(data) {
-        localStorage.setItem('slimData', JSON.stringify(data));
+        localStorage.setItem('slimDataV2', JSON.stringify(data));
     }
 
     const appData = getData();
@@ -298,10 +305,19 @@
         document.getElementById('today-date').textContent = now.getDate();
     }
 
-    const focusInput = document.getElementById('focus-input');
-    focusInput.value = appData.focus;
-    focusInput.addEventListener('input', () => {
-        appData.focus = focusInput.value;
+    // Verse Input Logic
+    const verseInput = document.getElementById('verse-input');
+    verseInput.value = appData.verse;
+    verseInput.addEventListener('input', () => {
+        appData.verse = verseInput.value;
+        saveData(appData);
+    });
+
+    // Schedule Input Logic
+    const scheduleInput = document.getElementById('schedule-input');
+    scheduleInput.value = appData.schedule;
+    scheduleInput.addEventListener('input', () => {
+        appData.schedule = scheduleInput.value;
         saveData(appData);
     });
 
