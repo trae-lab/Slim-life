@@ -17,7 +17,7 @@
             --border-radius: 24px;
             --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             --accent-color: #ff5e3a;
-            --star-gold: #ffcc00;
+            --star-red: #ff3b30;
         }
 
         body.light-theme {
@@ -88,10 +88,10 @@
             letter-spacing: -0.5px;
         }
 
-        /* Top Bar Action Icons */
+        /* Action Icon Buttons */
         .header-icon-btn {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -101,8 +101,13 @@
             color: var(--text-primary);
         }
 
+        /* Red Star Button Adjustment */
+        .star-btn {
+            margin-top: 14px; /* Shifted down slightly */
+        }
+
         .gear-icon svg, .star-btn svg {
-            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.4));
+            filter: drop-shadow(0px 4px 10px rgba(255, 59, 48, 0.3));
             transition: transform 0.2s ease;
         }
 
@@ -179,26 +184,32 @@
         /* Calendar Styling */
         .calendar-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-bottom: 16px;
         }
 
-        .calendar-nav {
+        /* iOS Style Month/Year Button */
+        .calendar-month-btn {
+            font-size: 20px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 16px;
+            border-radius: 16px;
+            cursor: pointer;
             display: flex;
-            gap: 8px;
             align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .calendar-month-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
+        .calendar-month-btn:active { background: rgba(255, 255, 255, 0.12); }
 
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 6px;
             text-align: center;
         }
 
@@ -210,11 +221,12 @@
         }
 
         .cal-day {
-            aspect-ratio: 1;
+            min-height: 52px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
+            padding-top: 6px;
             border-radius: 14px;
             font-size: 14px;
             cursor: pointer;
@@ -222,6 +234,7 @@
             color: var(--text-primary);
             background-color: var(--task-bg);
             transition: transform 0.15s ease, background-color 0.2s ease;
+            overflow: hidden;
         }
 
         .cal-day:active { transform: scale(0.92); }
@@ -236,17 +249,32 @@
             color: #ffffff !important;
         }
 
-        .cal-day.has-event::after {
-            content: '';
-            width: 5px;
-            height: 5px;
-            background-color: var(--star-gold);
-            border-radius: 50%;
-            position: absolute;
-            bottom: 4px;
+        .cal-day-name-tag {
+            font-size: 9px;
+            color: var(--star-red);
+            font-weight: 700;
+            margin-top: 2px;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 2px;
         }
 
-        /* Agenda & Schedule Styling */
+        .cal-day.selected .cal-day-name-tag { color: #ffffff; }
+
+        .cal-day.has-event::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background-color: var(--star-red);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 3px;
+        }
+
+        /* Schedule & Agenda Styling */
         .schedule-header {
             display: flex;
             justify-content: space-between;
@@ -286,12 +314,7 @@
             align-items: center;
         }
 
-        .schedule-time {
-            color: var(--accent-color);
-            font-size: 12px;
-            font-weight: 600;
-        }
-
+        .schedule-time { color: var(--accent-color); font-size: 12px; font-weight: 600; }
         .schedule-text { font-weight: 500; color: var(--text-primary); }
         .schedule-delete { background: none; border: none; color: var(--text-accent); cursor: pointer; font-size: 16px; }
 
@@ -350,7 +373,7 @@
         .task-item.completed .task-title { text-decoration: line-through; color: var(--text-accent); }
         .task-item.completed .task-checkbox { border-color: var(--text-accent); background-color: var(--text-accent); }
 
-        /* Bottom 3D Navigation Bar */
+        /* Bottom Navigation Bar */
         .bottom-nav-container {
             position: fixed;
             bottom: 16px;
@@ -386,90 +409,46 @@
         .nav-btn:active { transform: scale(0.9); }
 
         .icon-3d-home {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             background: linear-gradient(145deg, #232328, #101013);
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.2);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
             color: #ffffff;
         }
 
         .icon-3d-cal {
-            width: 44px;
-            height: 44px;
-            background: #ffffff;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.1);
+            width: 44px; height: 44px;
+            background: #ffffff; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center;
+            overflow: hidden; position: relative;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .icon-3d-cal-top {
-            width: 100%;
-            height: 18px;
+            width: 100%; height: 18px;
             background: linear-gradient(135deg, #ff7a00, #ff004c);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 6px;
+            display: flex; justify-content: space-around; align-items: center; padding: 0 6px;
         }
 
-        .icon-3d-cal-binder {
-            width: 4px;
-            height: 6px;
-            background: #ffffff;
-            border-radius: 2px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
+        .icon-3d-cal-binder { width: 4px; height: 6px; background: #ffffff; border-radius: 2px; }
 
-        .icon-3d-cal-body {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .icon-3d-cal-day {
-            font-size: 7px;
-            color: #ff004c;
-            font-weight: 700;
-            text-transform: uppercase;
-            line-height: 1;
-            margin-top: 1px;
-        }
-
-        .icon-3d-cal-num {
-            font-size: 14px;
-            color: #000000;
-            font-weight: 800;
-            line-height: 1;
-        }
+        .icon-3d-cal-body { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .icon-3d-cal-day { font-size: 7px; color: #ff004c; font-weight: 700; text-transform: uppercase; line-height: 1; }
+        .icon-3d-cal-num { font-size: 14px; color: #000000; font-weight: 800; line-height: 1; }
 
         .nav-btn.active .icon-3d-home,
-        .nav-btn.active .icon-3d-cal {
-            outline: 2px solid var(--accent-color);
-            outline-offset: 2px;
-        }
+        .nav-btn.active .icon-3d-cal { outline: 2px solid var(--accent-color); outline-offset: 2px; }
 
         /* Modal Overlays */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            opacity: 0;
-            pointer-events: none;
+            display: flex; justify-content: center; align-items: flex-end;
+            opacity: 0; pointer-events: none;
             transition: opacity 0.2s ease;
             z-index: 100;
         }
@@ -478,22 +457,16 @@
 
         .modal {
             background-color: var(--modal-bg);
-            width: 100%;
-            max-width: 480px;
-            border-top-left-radius: 28px;
-            border-top-right-radius: 28px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+            width: 100%; max-width: 480px;
+            border-top-left-radius: 28px; border-top-right-radius: 28px;
+            padding: 24px; display: flex; flex-direction: column; gap: 16px;
             transform: translateY(100%);
             transition: transform 0.25s ease;
-            max-height: 85vh;
-            overflow-y: auto;
+            max-height: 85vh; overflow-y: auto;
         }
 
         .modal-overlay.open .modal { transform: translateY(0); }
-        .modal-title { font-size: 18px; font-weight: 500; margin: 0 0 8px 0; }
+        .modal-title { font-size: 18px; font-weight: 600; margin: 0 0 4px 0; }
 
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 12px; color: var(--text-accent); text-transform: uppercase; }
@@ -504,14 +477,11 @@
             border-radius: 12px;
             padding: 12px;
             color: var(--text-primary);
-            font-size: 15px;
-            outline: none;
-            font-family: inherit;
+            font-size: 15px; outline: none; font-family: inherit;
         }
 
-        .form-textarea { resize: vertical; height: 80px; }
+        .form-textarea { resize: vertical; height: 75px; }
 
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 8px; }
 
         .btn-primary {
@@ -524,17 +494,21 @@
             border: none; border-radius: 14px; padding: 12px; cursor: pointer;
         }
 
+        .star-section-title {
+            font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--star-red); margin-top: 8px;
+        }
+
         .important-list-item {
             background-color: var(--task-bg);
-            padding: 12px 16px;
-            border-radius: 14px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            padding: 12px 14px; border-radius: 14px;
+            margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;
         }
         .important-date { color: var(--accent-color); font-size: 12px; font-weight: 600; }
-        .important-title { font-size: 15px; font-weight: 500; }
+        .important-title { font-size: 14px; font-weight: 500; }
+
+        .ios-picker-row { display: flex; gap: 10px; }
+        .ios-picker-row select { flex: 1; text-align: center; font-size: 16px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -598,21 +572,21 @@
                 <div id="greeting-time">Calendar</div>
                 <h1 class="page-title">Events & Plans</h1>
             </div>
-            <!-- TOP RIGHT IMPORTANT DAYS STAR BUTTON -->
+            <!-- RED STAR BUTTON POSITIONED DOWN -->
             <button class="header-icon-btn star-btn" onclick="openImportantModal()" title="View Marked Important Days">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="var(--star-gold)">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="var(--star-red)">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                 </svg>
             </button>
         </header>
 
         <div class="widget">
+            <!-- iOS STYLE MONTH/YEAR PICKER BUTTON (NO ARROWS) -->
             <div class="calendar-header">
-                <div class="calendar-month-title" id="cal-month-year">July 2026</div>
-                <div class="calendar-nav">
-                    <button class="btn-small" onclick="prevMonth()">&lt;</button>
-                    <button class="btn-small" onclick="nextMonth()">&gt;</button>
-                </div>
+                <button class="calendar-month-btn" onclick="openIosPickerModal()">
+                    <span id="cal-month-year">July 2026</span>
+                    <span style="font-size:12px; opacity:0.6;">▼</span>
+                </button>
             </div>
             <div class="cal-grid">
                 <div class="cal-day-name">S</div>
@@ -626,7 +600,6 @@
             <div class="cal-grid" id="cal-days-grid" style="margin-top: 6px;"></div>
         </div>
 
-        <!-- Dynamic Selected Day Agenda -->
         <div class="widget">
             <div class="schedule-header">
                 <div class="widget-label" style="margin:0;" id="agenda-date-title">Selected Day Agenda</div>
@@ -663,18 +636,47 @@
 
 <!-- MODALS -->
 
-<!-- Modal: Add Calendar Event & Linked Tasks -->
+<!-- Modal: iOS Month & Year Selector -->
+<div class="modal-overlay" id="ios-picker-modal">
+    <div class="modal">
+        <h3 class="modal-title">Select Month & Year</h3>
+        <div class="ios-picker-row">
+            <select id="picker-month-select" class="form-select">
+                <option value="0">January</option><option value="1">February</option>
+                <option value="2">March</option><option value="3">April</option>
+                <option value="4">May</option><option value="5">June</option>
+                <option value="6">July</option><option value="7">August</option>
+                <option value="8">September</option><option value="9">October</option>
+                <option value="10">November</option><option value="11">December</option>
+            </select>
+            <select id="picker-year-select" class="form-select"></select>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('ios-picker-modal')">Cancel</button>
+            <button class="btn-primary" onclick="applyIosMonthYear()">Apply</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Calendar Event -->
 <div class="modal-overlay" id="event-modal">
     <div class="modal">
-        <h3 class="modal-title">Mark Day / Add Event</h3>
+        <h3 class="modal-title">Mark Day / Event</h3>
         <div class="form-group">
             <label>Event Name / Highlight</label>
-            <input type="text" id="event-title-input" class="form-input" placeholder="e.g., Birthday Party, Important Deadline">
+            <input type="text" id="event-title-input" class="form-input" placeholder="e.g. Slim's Birthday">
         </div>
         <div class="form-group">
-            <label>Tasks to perform on this day (Comma-separated)</label>
-            <textarea id="event-tasks-input" class="form-textarea" placeholder="e.g., Buy cake, Call venue, Pick up decorations"></textarea>
-            <span style="font-size:11px; color:var(--text-accent);">These tasks will automatically load into your Today's Tasks list when this date arrives!</span>
+            <label>Event Type</label>
+            <select id="event-recurring-input" class="form-select">
+                <option value="yearly">★ Recurring Yearly (Birthdays, Anniversaries)</option>
+                <option value="upcoming">🗓 Upcoming Event (One-time)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tasks for this day (Comma-separated)</label>
+            <textarea id="event-tasks-input" class="form-textarea" placeholder="e.g. Buy gifts, Order cake, Reserve table"></textarea>
+            <span style="font-size:11px; color:var(--text-accent);">Each item will convert into its own separate task card on your Homepage!</span>
         </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('event-modal')">Cancel</button>
@@ -683,11 +685,17 @@
     </div>
 </div>
 
-<!-- Modal: View Marked Important Days (Star Button Action) -->
+<!-- Modal: View Marked Important Days (Two Parts) -->
 <div class="modal-overlay" id="important-modal">
     <div class="modal">
-        <h3 class="modal-title">★ Marked Important Days</h3>
-        <div id="important-events-list"></div>
+        <h3 class="modal-title" style="color:var(--star-red);">★ Important Days</h3>
+        
+        <div class="star-section-title">1. Yearly Recurring Days</div>
+        <div id="important-yearly-list"></div>
+
+        <div class="star-section-title" style="margin-top:14px;">2. Upcoming Events</div>
+        <div id="important-upcoming-list"></div>
+
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('important-modal')">Close</button>
         </div>
@@ -738,10 +746,6 @@
             <label>Current Streak (Days)</label>
             <input type="number" id="setting-streak-input" class="form-input">
         </div>
-        <div class="toggle-row">
-            <span>Theme Mode</span>
-            <button class="btn-small" id="theme-toggle-btn" onclick="toggleTheme()">Dark Theme</button>
-        </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
             <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
@@ -751,29 +755,26 @@
 
 <script>
     function getData() {
-        const data = localStorage.getItem('slimDataV6');
+        const data = localStorage.getItem('slimDataV7');
         return data ? JSON.parse(data) : { 
             userName: 'Slim',
             streak: 0,
             theme: 'dark',
             verse: '', 
-            events: {}, // Key: YYYY-MM-DD, Value: Array of { title, tasks: [] }
+            events: {}, // Key: YYYY-MM-DD, Value: Array of { title, type: 'yearly'|'upcoming', tasks: [] }
             syncedDates: [],
             schedule: [{ time: '09:00 AM', text: 'Morning Focus' }], 
             tasks: [{ id: 1, title: 'Build app interface', category: 'Work', priority: 'high', completed: false }] 
         };
     }
 
-    function saveData(data) {
-        localStorage.setItem('slimDataV6', JSON.stringify(data));
-    }
+    function saveData(data) { localStorage.setItem('slimDataV7', JSON.stringify(data)); }
 
     const appData = getData();
     let currentFilter = 'all';
     let calDate = new Date();
     let selectedDateKey = '';
 
-    // Switch Views
     function switchTab(tab) {
         document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -787,70 +788,57 @@
         }
     }
 
-    // Auto Sync Calendar Tasks to Today's Task List when current date arrives
+    // Auto Sync Calendar Tasks -> Separate homepage task items
     function checkAndAutoSyncCalendarTasks() {
         const now = new Date();
-        const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        
+        const curMonthDay = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const todayKey = `${now.getFullYear()}-${curMonthDay}`;
+
         if (!appData.syncedDates) appData.syncedDates = [];
 
-        if (appData.events && appData.events[todayKey] && !appData.syncedDates.includes(todayKey)) {
-            appData.events[todayKey].forEach(ev => {
-                if (ev.tasks && ev.tasks.length > 0) {
-                    ev.tasks.forEach(tTitle => {
-                        appData.tasks.unshift({
-                            id: Date.now() + Math.random(),
-                            title: `[${ev.title}] ${tTitle}`,
-                            category: 'Event',
-                            priority: 'high',
-                            completed: false
-                        });
+        if (!appData.syncedDates.includes(todayKey)) {
+            Object.keys(appData.events || {}).forEach(dateKey => {
+                const isYearly = dateKey.endsWith(curMonthDay);
+                const isExactToday = (dateKey === todayKey);
+
+                if (isYearly || isExactToday) {
+                    appData.events[dateKey].forEach(ev => {
+                        if (ev.tasks && ev.tasks.length > 0) {
+                            ev.tasks.forEach(taskItem => {
+                                appData.tasks.unshift({
+                                    id: Date.now() + Math.random(),
+                                    title: `[${ev.title}] ${taskItem}`,
+                                    category: 'Event',
+                                    priority: 'high',
+                                    completed: false
+                                });
+                            });
+                        }
                     });
                 }
             });
+
             appData.syncedDates.push(todayKey);
             saveData(appData);
         }
     }
 
-    // Theme Switcher
-    function applyTheme() {
-        if (appData.theme === 'light') {
-            document.body.classList.add('light-theme');
-            document.getElementById('theme-toggle-btn').textContent = 'Light Theme';
-        } else {
-            document.body.classList.remove('light-theme');
-            document.getElementById('theme-toggle-btn').textContent = 'Dark Theme';
-        }
-    }
-
-    function toggleTheme() {
-        appData.theme = appData.theme === 'light' ? 'dark' : 'light';
-        applyTheme();
-        saveData(appData);
-    }
-
     function updateHeader() {
         const now = new Date();
         const hours = now.getHours();
-        let greeting = 'Good morning';
-        if (hours >= 12 && hours < 17) greeting = 'Good afternoon';
-        if (hours >= 17) greeting = 'Good evening';
-        
+        let greeting = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
+
         document.getElementById('greeting-time').textContent = greeting;
         document.getElementById('user-name').textContent = appData.userName || 'Slim';
         document.getElementById('streak-count').textContent = appData.streak || 0;
-        
+
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         document.getElementById('today-mon').textContent = days[now.getDay()];
         document.getElementById('today-date').textContent = now.getDate();
-
-        // Dynamic 3D Calendar Icon Sync
         document.getElementById('nav-cal-day-text').textContent = days[now.getDay()];
         document.getElementById('nav-cal-num-text').textContent = now.getDate();
     }
 
-    // Verse Input Handler
     const verseInput = document.getElementById('verse-input');
     verseInput.value = appData.verse || '';
     verseInput.addEventListener('input', () => {
@@ -863,9 +851,9 @@
         const year = calDate.getFullYear();
         const month = calDate.getMonth();
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        
+
         document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
-        
+
         const grid = document.getElementById('cal-days-grid');
         grid.innerHTML = '';
 
@@ -880,10 +868,16 @@
         for (let day = 1; day <= totalDays; day++) {
             const dayEl = document.createElement('div');
             dayEl.className = 'cal-day';
-            dayEl.textContent = day;
 
-            const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            
+            const numSpan = document.createElement('span');
+            numSpan.textContent = day;
+            dayEl.appendChild(numSpan);
+
+            const monthStr = String(month + 1).padStart(2, '0');
+            const dayStr = String(day).padStart(2, '0');
+            const dateKey = `${year}-${monthStr}-${dayStr}`;
+            const mmdd = `${monthStr}-${dayStr}`;
+
             if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
                 dayEl.classList.add('today');
             }
@@ -892,8 +886,28 @@
                 dayEl.classList.add('selected');
             }
 
-            if (appData.events && appData.events[dateKey] && appData.events[dateKey].length > 0) {
-                dayEl.classList.add('has-event');
+            // Check for events & yearly birthdays
+            let foundFirstName = '';
+            let hasEvents = false;
+
+            Object.keys(appData.events || {}).forEach(k => {
+                if (k === dateKey || k.endsWith(mmdd)) {
+                    hasEvents = true;
+                    appData.events[k].forEach(ev => {
+                        if (ev.type === 'yearly' && !foundFirstName) {
+                            foundFirstName = ev.title.split(' ')[0]; // Extract first name
+                        }
+                    });
+                }
+            });
+
+            if (hasEvents) dayEl.classList.add('has-event');
+
+            if (foundFirstName) {
+                const nameTag = document.createElement('div');
+                nameTag.className = 'cal-day-name-tag';
+                nameTag.textContent = foundFirstName;
+                dayEl.appendChild(nameTag);
             }
 
             dayEl.onclick = () => selectCalendarDate(dateKey, day, monthNames[month], year);
@@ -906,9 +920,6 @@
         }
     }
 
-    function prevMonth() { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
-    function nextMonth() { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
-
     function selectCalendarDate(dateKey, day, monthName, year) {
         selectedDateKey = dateKey;
         document.getElementById('agenda-date-title').textContent = `${monthName} ${day}, ${year}`;
@@ -919,26 +930,35 @@
     function renderAgendaList() {
         const container = document.getElementById('agenda-event-list');
         container.innerHTML = '';
-        
-        const events = (appData.events && appData.events[selectedDateKey]) || [];
-        if (events.length === 0) {
+
+        const monthDayStr = selectedDateKey.substring(5);
+        let currentDayEvents = [];
+
+        Object.keys(appData.events || {}).forEach(k => {
+            if (k === selectedDateKey || k.endsWith(monthDayStr)) {
+                appData.events[k].forEach((ev, idx) => {
+                    currentDayEvents.push({ key: k, index: idx, event: ev });
+                });
+            }
+        });
+
+        if (currentDayEvents.length === 0) {
             container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No events saved for this day.</div>';
             return;
         }
 
-        events.forEach((ev, idx) => {
+        currentDayEvents.forEach((itemObj) => {
+            const ev = itemObj.event;
             const div = document.createElement('div');
             div.className = 'schedule-item';
-            
-            let tasksHtml = '';
-            if (ev.tasks && ev.tasks.length > 0) {
-                tasksHtml = `<div class="event-tasks-tag">📋 Tasks: ${ev.tasks.join(', ')}</div>`;
-            }
+
+            let tasksHtml = ev.tasks && ev.tasks.length > 0 ? `<div class="event-tasks-tag">📋 Tasks: ${ev.tasks.join(', ')}</div>` : '';
+            let badgeText = ev.type === 'yearly' ? '🔁 Yearly' : '🗓 Event';
 
             div.innerHTML = `
                 <div class="schedule-item-top">
-                    <span class="schedule-text">★ ${ev.title}</span>
-                    <button class="schedule-delete" onclick="deleteCalendarEvent(${idx})">&times;</button>
+                    <span class="schedule-text">★ ${ev.title} <small style="font-size:10px; opacity:0.6; margin-left:4px;">(${badgeText})</small></span>
+                    <button class="schedule-delete" onclick="deleteCalendarEvent('${itemObj.key}', ${itemObj.index})">&times;</button>
                 </div>
                 ${tasksHtml}
             `;
@@ -954,17 +974,18 @@
 
     function saveNewCalendarEvent() {
         const title = document.getElementById('event-title-input').value.trim();
+        const type = document.getElementById('event-recurring-input').value;
         const rawTasks = document.getElementById('event-tasks-input').value.trim();
 
         if (title) {
             if (!appData.events) appData.events = {};
             if (!appData.events[selectedDateKey]) appData.events[selectedDateKey] = [];
-            
+
             const tasksList = rawTasks ? rawTasks.split(',').map(t => t.trim()).filter(t => t.length > 0) : [];
 
-            appData.events[selectedDateKey].push({ title, tasks: tasksList });
+            appData.events[selectedDateKey].push({ title, type, tasks: tasksList });
             saveData(appData);
-            
+
             checkAndAutoSyncCalendarTasks();
             renderAgendaList();
             renderCalendar();
@@ -973,42 +994,86 @@
         }
     }
 
-    function deleteCalendarEvent(index) {
-        if (appData.events && appData.events[selectedDateKey]) {
-            appData.events[selectedDateKey].splice(index, 1);
-            if (appData.events[selectedDateKey].length === 0) delete appData.events[selectedDateKey];
+    function deleteCalendarEvent(key, index) {
+        if (appData.events && appData.events[key]) {
+            appData.events[key].splice(index, 1);
+            if (appData.events[key].length === 0) delete appData.events[key];
             saveData(appData);
             renderAgendaList();
             renderCalendar();
         }
     }
 
-    // Modal Action: Star Button Important Events Viewer
+    // iOS Picker Modal Functions
+    function openIosPickerModal() {
+        const monthSel = document.getElementById('picker-month-select');
+        const yearSel = document.getElementById('picker-year-select');
+
+        monthSel.value = calDate.getMonth();
+        yearSel.innerHTML = '';
+
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear - 5; y <= currentYear + 10; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            if (y === calDate.getFullYear()) opt.selected = true;
+            yearSel.appendChild(opt);
+        }
+
+        document.getElementById('ios-picker-modal').classList.add('open');
+    }
+
+    function applyIosMonthYear() {
+        const month = parseInt(document.getElementById('picker-month-select').value, 10);
+        const year = parseInt(document.getElementById('picker-year-select').value, 10);
+
+        calDate.setFullYear(year);
+        calDate.setMonth(month);
+
+        renderCalendar();
+        closeModal('ios-picker-modal');
+    }
+
+    // Star Button: Two-Part Important Events Viewer
     function openImportantModal() {
-        const container = document.getElementById('important-events-list');
-        container.innerHTML = '';
-        
-        const allKeys = Object.keys(appData.events || {}).sort();
+        const yearlyList = document.getElementById('important-yearly-list');
+        const upcomingList = document.getElementById('important-upcoming-list');
+        yearlyList.innerHTML = '';
+        upcomingList.innerHTML = '';
 
-        if (allKeys.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-accent); font-size:14px; text-align:center; padding: 20px 0;">No marked important days yet!</div>';
-        } else {
-            allKeys.forEach(dateKey => {
-                appData.events[dateKey].forEach(ev => {
-                    const item = document.createElement('div');
-                    item.className = 'important-list-item';
-                    
-                    let taskDetail = ev.tasks && ev.tasks.length > 0 ? `<div style="font-size:12px; color:var(--text-secondary);">Tasks: ${ev.tasks.join(', ')}</div>` : '';
+        let yearlyCount = 0;
+        let upcomingCount = 0;
 
+        Object.keys(appData.events || {}).sort().forEach(dateKey => {
+            appData.events[dateKey].forEach(ev => {
+                const item = document.createElement('div');
+                item.className = 'important-list-item';
+
+                let taskDetail = ev.tasks && ev.tasks.length > 0 ? `<div style="font-size:12px; color:var(--text-secondary);">Tasks: ${ev.tasks.join(', ')}</div>` : '';
+
+                if (ev.type === 'yearly') {
+                    yearlyCount++;
                     item.innerHTML = `
-                        <div class="important-date">${dateKey}</div>
+                        <div class="important-date">Every Year on ${dateKey.substring(5)}</div>
                         <div class="important-title">★ ${ev.title}</div>
                         ${taskDetail}
                     `;
-                    container.appendChild(item);
-                });
+                    yearlyList.appendChild(item);
+                } else {
+                    upcomingCount++;
+                    item.innerHTML = `
+                        <div class="important-date">${dateKey}</div>
+                        <div class="important-title">🗓 ${ev.title}</div>
+                        ${taskDetail}
+                    `;
+                    upcomingList.appendChild(item);
+                }
             });
-        }
+        });
+
+        if (yearlyCount === 0) yearlyList.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No yearly recurring events set.</div>';
+        if (upcomingCount === 0) upcomingList.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No upcoming one-time events set.</div>';
 
         document.getElementById('important-modal').classList.add('open');
     }
@@ -1052,7 +1117,7 @@
         renderSchedule();
     }
 
-    // Task Engine
+    // Task System
     function setFilter(filter, btn) {
         currentFilter = filter;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1063,7 +1128,7 @@
     function renderTasks() {
         const taskList = document.getElementById('task-list');
         taskList.innerHTML = '';
-        
+
         const filteredTasks = appData.tasks.filter(t => {
             if (currentFilter === 'active') return !t.completed;
             if (currentFilter === 'completed') return t.completed;
@@ -1130,7 +1195,7 @@
     function saveSettings() {
         const name = document.getElementById('setting-name-input').value.trim();
         const streak = parseInt(document.getElementById('setting-streak-input').value, 10);
-        
+
         if (name) appData.userName = name;
         if (!isNaN(streak)) appData.streak = streak;
 
@@ -1140,7 +1205,6 @@
     }
 
     // Init App
-    applyTheme();
     updateHeader();
     checkAndAutoSyncCalendarTasks();
     renderCalendar();
