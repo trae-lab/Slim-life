@@ -17,6 +17,7 @@
             --border-radius: 24px;
             --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             --accent-color: #ff5e3a;
+            --star-gold: #ffcc00;
         }
 
         body.light-theme {
@@ -87,23 +88,26 @@
             letter-spacing: -0.5px;
         }
 
-        /* 3D Gear Icon */
-        .gear-icon {
+        /* Top Bar Action Icons */
+        .header-icon-btn {
             width: 48px;
             height: 48px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-primary);
         }
 
-        .gear-icon svg {
+        .gear-icon svg, .star-btn svg {
             filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.4));
             transition: transform 0.2s ease;
         }
 
-        .gear-icon:active svg {
-            transform: scale(0.92) rotate(30deg);
+        .header-icon-btn:active svg {
+            transform: scale(0.9) rotate(15deg);
         }
 
         .grid-2 {
@@ -236,13 +240,13 @@
             content: '';
             width: 5px;
             height: 5px;
-            background-color: #ff3b30;
+            background-color: var(--star-gold);
             border-radius: 50%;
             position: absolute;
             bottom: 4px;
         }
 
-        /* Schedule / Agenda Styling */
+        /* Agenda & Schedule Styling */
         .schedule-header {
             display: flex;
             justify-content: space-between;
@@ -263,28 +267,42 @@
         .schedule-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .schedule-item {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            gap: 6px;
             background-color: var(--task-bg);
-            padding: 10px 14px;
-            border-radius: 14px;
+            padding: 12px 14px;
+            border-radius: 16px;
             font-size: 14px;
+        }
+
+        .schedule-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .schedule-time {
             color: var(--accent-color);
             font-size: 12px;
             font-weight: 600;
-            min-width: 65px;
         }
 
-        .schedule-text { flex-grow: 1; color: var(--text-primary); }
-        .schedule-delete { background: none; border: none; color: var(--text-accent); cursor: pointer; }
+        .schedule-text { font-weight: 500; color: var(--text-primary); }
+        .schedule-delete { background: none; border: none; color: var(--text-accent); cursor: pointer; font-size: 16px; }
+
+        .event-tasks-tag {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-top: 4px;
+        }
 
         /* Tasks Styling */
         .tasks-header {
@@ -367,7 +385,6 @@
 
         .nav-btn:active { transform: scale(0.9); }
 
-        /* 3D Home Button Tile */
         .icon-3d-home {
             width: 44px;
             height: 44px;
@@ -381,7 +398,6 @@
             color: #ffffff;
         }
 
-        /* 3D Calendar Button Tile (Matched to provided Image 1) */
         .icon-3d-cal {
             width: 44px;
             height: 44px;
@@ -444,7 +460,7 @@
             outline-offset: 2px;
         }
 
-        /* Modal Overlay */
+        /* Modal Overlays */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -472,6 +488,8 @@
             gap: 16px;
             transform: translateY(100%);
             transition: transform 0.25s ease;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         .modal-overlay.open .modal { transform: translateY(0); }
@@ -480,7 +498,7 @@
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 12px; color: var(--text-accent); text-transform: uppercase; }
 
-        .form-input, .form-select {
+        .form-input, .form-select, .form-textarea {
             background-color: var(--task-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -488,7 +506,10 @@
             color: var(--text-primary);
             font-size: 15px;
             outline: none;
+            font-family: inherit;
         }
+
+        .form-textarea { resize: vertical; height: 80px; }
 
         .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 8px; }
@@ -502,6 +523,18 @@
             flex: 1; background-color: var(--task-bg); color: var(--text-primary);
             border: none; border-radius: 14px; padding: 12px; cursor: pointer;
         }
+
+        .important-list-item {
+            background-color: var(--task-bg);
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .important-date { color: var(--accent-color); font-size: 12px; font-weight: 600; }
+        .important-title { font-size: 15px; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -515,11 +548,11 @@
                 <div id="greeting-time">Good evening</div>
                 <h1 class="page-title" id="user-name">Slim</h1>
             </div>
-            <div class="gear-icon" onclick="openSettingsModal()">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <button class="header-icon-btn gear-icon" onclick="openSettingsModal()">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23-0.41-0.12-0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
                 </svg>
-            </div>
+            </button>
         </header>
 
         <div class="grid-2">
@@ -565,6 +598,12 @@
                 <div id="greeting-time">Calendar</div>
                 <h1 class="page-title">Events & Plans</h1>
             </div>
+            <!-- TOP RIGHT IMPORTANT DAYS STAR BUTTON -->
+            <button class="header-icon-btn star-btn" onclick="openImportantModal()" title="View Marked Important Days">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="var(--star-gold)">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+            </button>
         </header>
 
         <div class="widget">
@@ -587,11 +626,11 @@
             <div class="cal-grid" id="cal-days-grid" style="margin-top: 6px;"></div>
         </div>
 
-        <!-- Dynamic Selected Day View -->
+        <!-- Dynamic Selected Day Agenda -->
         <div class="widget">
             <div class="schedule-header">
                 <div class="widget-label" style="margin:0;" id="agenda-date-title">Selected Day Agenda</div>
-                <button class="btn-small" onclick="promptAddEventForSelectedDay()">+ add event</button>
+                <button class="btn-small" onclick="openAddEventModal()">+ add event</button>
             </div>
             <div class="schedule-list" id="agenda-event-list"></div>
         </div>
@@ -622,7 +661,40 @@
     </button>
 </div>
 
-<!-- Modal Dialogs -->
+<!-- MODALS -->
+
+<!-- Modal: Add Calendar Event & Linked Tasks -->
+<div class="modal-overlay" id="event-modal">
+    <div class="modal">
+        <h3 class="modal-title">Mark Day / Add Event</h3>
+        <div class="form-group">
+            <label>Event Name / Highlight</label>
+            <input type="text" id="event-title-input" class="form-input" placeholder="e.g., Birthday Party, Important Deadline">
+        </div>
+        <div class="form-group">
+            <label>Tasks to perform on this day (Comma-separated)</label>
+            <textarea id="event-tasks-input" class="form-textarea" placeholder="e.g., Buy cake, Call venue, Pick up decorations"></textarea>
+            <span style="font-size:11px; color:var(--text-accent);">These tasks will automatically load into your Today's Tasks list when this date arrives!</span>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('event-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewCalendarEvent()">Save Event</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: View Marked Important Days (Star Button Action) -->
+<div class="modal-overlay" id="important-modal">
+    <div class="modal">
+        <h3 class="modal-title">★ Marked Important Days</h3>
+        <div id="important-events-list"></div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('important-modal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Task -->
 <div class="modal-overlay" id="task-modal">
     <div class="modal">
         <h3 class="modal-title">New Task</h3>
@@ -654,6 +726,7 @@
     </div>
 </div>
 
+<!-- Modal: Settings -->
 <div class="modal-overlay" id="settings-modal">
     <div class="modal">
         <h3 class="modal-title">Settings</h3>
@@ -678,20 +751,21 @@
 
 <script>
     function getData() {
-        const data = localStorage.getItem('slimDataV5');
+        const data = localStorage.getItem('slimDataV6');
         return data ? JSON.parse(data) : { 
             userName: 'Slim',
             streak: 0,
             theme: 'dark',
             verse: '', 
-            events: {}, 
+            events: {}, // Key: YYYY-MM-DD, Value: Array of { title, tasks: [] }
+            syncedDates: [],
             schedule: [{ time: '09:00 AM', text: 'Morning Focus' }], 
             tasks: [{ id: 1, title: 'Build app interface', category: 'Work', priority: 'high', completed: false }] 
         };
     }
 
     function saveData(data) {
-        localStorage.setItem('slimDataV5', JSON.stringify(data));
+        localStorage.setItem('slimDataV6', JSON.stringify(data));
     }
 
     const appData = getData();
@@ -699,7 +773,7 @@
     let calDate = new Date();
     let selectedDateKey = '';
 
-    // Page Tab Switching
+    // Switch Views
     function switchTab(tab) {
         document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -710,6 +784,32 @@
         } else {
             document.getElementById('page-calendar').classList.add('active');
             document.getElementById('nav-cal').classList.add('active');
+        }
+    }
+
+    // Auto Sync Calendar Tasks to Today's Task List when current date arrives
+    function checkAndAutoSyncCalendarTasks() {
+        const now = new Date();
+        const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        
+        if (!appData.syncedDates) appData.syncedDates = [];
+
+        if (appData.events && appData.events[todayKey] && !appData.syncedDates.includes(todayKey)) {
+            appData.events[todayKey].forEach(ev => {
+                if (ev.tasks && ev.tasks.length > 0) {
+                    ev.tasks.forEach(tTitle => {
+                        appData.tasks.unshift({
+                            id: Date.now() + Math.random(),
+                            title: `[${ev.title}] ${tTitle}`,
+                            category: 'Event',
+                            priority: 'high',
+                            completed: false
+                        });
+                    });
+                }
+            });
+            appData.syncedDates.push(todayKey);
+            saveData(appData);
         }
     }
 
@@ -745,12 +845,12 @@
         document.getElementById('today-mon').textContent = days[now.getDay()];
         document.getElementById('today-date').textContent = now.getDate();
 
-        // Update 3D Calendar Nav Icon automatically
+        // Dynamic 3D Calendar Icon Sync
         document.getElementById('nav-cal-day-text').textContent = days[now.getDay()];
         document.getElementById('nav-cal-num-text').textContent = now.getDate();
     }
 
-    // Verse Input
+    // Verse Input Handler
     const verseInput = document.getElementById('verse-input');
     verseInput.value = appData.verse || '';
     verseInput.addEventListener('input', () => {
@@ -829,23 +929,47 @@
         events.forEach((ev, idx) => {
             const div = document.createElement('div');
             div.className = 'schedule-item';
+            
+            let tasksHtml = '';
+            if (ev.tasks && ev.tasks.length > 0) {
+                tasksHtml = `<div class="event-tasks-tag">📋 Tasks: ${ev.tasks.join(', ')}</div>`;
+            }
+
             div.innerHTML = `
-                <span class="schedule-text">${ev}</span>
-                <button class="schedule-delete" onclick="deleteCalendarEvent(${idx})">&times;</button>
+                <div class="schedule-item-top">
+                    <span class="schedule-text">★ ${ev.title}</span>
+                    <button class="schedule-delete" onclick="deleteCalendarEvent(${idx})">&times;</button>
+                </div>
+                ${tasksHtml}
             `;
             container.appendChild(div);
         });
     }
 
-    function promptAddEventForSelectedDay() {
-        const title = prompt("Event / Important Day Title:");
+    function openAddEventModal() {
+        document.getElementById('event-title-input').value = '';
+        document.getElementById('event-tasks-input').value = '';
+        document.getElementById('event-modal').classList.add('open');
+    }
+
+    function saveNewCalendarEvent() {
+        const title = document.getElementById('event-title-input').value.trim();
+        const rawTasks = document.getElementById('event-tasks-input').value.trim();
+
         if (title) {
             if (!appData.events) appData.events = {};
             if (!appData.events[selectedDateKey]) appData.events[selectedDateKey] = [];
-            appData.events[selectedDateKey].push(title);
+            
+            const tasksList = rawTasks ? rawTasks.split(',').map(t => t.trim()).filter(t => t.length > 0) : [];
+
+            appData.events[selectedDateKey].push({ title, tasks: tasksList });
             saveData(appData);
+            
+            checkAndAutoSyncCalendarTasks();
             renderAgendaList();
             renderCalendar();
+            renderTasks();
+            closeModal('event-modal');
         }
     }
 
@@ -859,6 +983,36 @@
         }
     }
 
+    // Modal Action: Star Button Important Events Viewer
+    function openImportantModal() {
+        const container = document.getElementById('important-events-list');
+        container.innerHTML = '';
+        
+        const allKeys = Object.keys(appData.events || {}).sort();
+
+        if (allKeys.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-accent); font-size:14px; text-align:center; padding: 20px 0;">No marked important days yet!</div>';
+        } else {
+            allKeys.forEach(dateKey => {
+                appData.events[dateKey].forEach(ev => {
+                    const item = document.createElement('div');
+                    item.className = 'important-list-item';
+                    
+                    let taskDetail = ev.tasks && ev.tasks.length > 0 ? `<div style="font-size:12px; color:var(--text-secondary);">Tasks: ${ev.tasks.join(', ')}</div>` : '';
+
+                    item.innerHTML = `
+                        <div class="important-date">${dateKey}</div>
+                        <div class="important-title">★ ${ev.title}</div>
+                        ${taskDetail}
+                    `;
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        document.getElementById('important-modal').classList.add('open');
+    }
+
     // Schedule System
     function renderSchedule() {
         const container = document.getElementById('schedule-list');
@@ -870,9 +1024,11 @@
         appData.schedule.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'schedule-item';
+            div.style.flexDirection = 'row';
+            div.style.justifyContent = 'space-between';
             div.innerHTML = `
                 <span class="schedule-time">${item.time}</span>
-                <span class="schedule-text">${item.text}</span>
+                <span class="schedule-text" style="flex-grow:1; margin-left:12px;">${item.text}</span>
                 <button class="schedule-delete" onclick="deleteScheduleItem(${index})">&times;</button>
             `;
             container.appendChild(div);
@@ -896,7 +1052,7 @@
         renderSchedule();
     }
 
-    // Task System
+    // Task Engine
     function setFilter(filter, btn) {
         currentFilter = filter;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -986,6 +1142,7 @@
     // Init App
     applyTheme();
     updateHeader();
+    checkAndAutoSyncCalendarTasks();
     renderCalendar();
     renderSchedule();
     renderTasks();
