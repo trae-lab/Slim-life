@@ -18,6 +18,8 @@
             --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             --accent-color: #ff5e3a;
             --star-red: #ff3b30;
+            --gold-accent: #f7d070;
+            --purple-accent: #9d73f7;
         }
 
         body.light-theme {
@@ -88,7 +90,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Action Icon Buttons */
         .header-icon-btn {
             width: 44px;
             height: 44px;
@@ -101,9 +102,8 @@
             color: var(--text-primary);
         }
 
-        /* Red Star Button Adjustment */
         .star-btn {
-            margin-top: 14px; /* Shifted down slightly */
+            margin-top: 14px;
         }
 
         .gear-icon svg, .star-btn svg {
@@ -189,7 +189,6 @@
             margin-bottom: 16px;
         }
 
-        /* iOS Style Month/Year Button */
         .calendar-month-btn {
             font-size: 20px;
             font-weight: 600;
@@ -274,7 +273,7 @@
             bottom: 3px;
         }
 
-        /* Schedule & Agenda Styling */
+        /* Schedule & Lists */
         .schedule-header {
             display: flex;
             justify-content: space-between;
@@ -373,6 +372,30 @@
         .task-item.completed .task-title { text-decoration: line-through; color: var(--text-accent); }
         .task-item.completed .task-checkbox { border-color: var(--text-accent); background-color: var(--text-accent); }
 
+        /* Future Plans Items */
+        .plan-item {
+            background-color: var(--task-bg);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .plan-item-name { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+        .plan-item-cost { font-size: 14px; font-weight: 600; color: var(--accent-color); }
+
+        .budget-total-box {
+            background: linear-gradient(135deg, rgba(157, 115, 247, 0.15), rgba(255, 94, 58, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
         /* Bottom Navigation Bar */
         .bottom-nav-container {
             position: fixed;
@@ -385,7 +408,7 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-radius: 28px;
-            padding: 8px 24px;
+            padding: 8px 20px;
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -439,10 +462,53 @@
         .icon-3d-cal-day { font-size: 7px; color: #ff004c; font-weight: 700; text-transform: uppercase; line-height: 1; }
         .icon-3d-cal-num { font-size: 14px; color: #000000; font-weight: 800; line-height: 1; }
 
-        .nav-btn.active .icon-3d-home,
-        .nav-btn.active .icon-3d-cal { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        /* Custom 3D Layer Icon generated from image */
+        .icon-3d-plans {
+            width: 44px; height: 44px;
+            border-radius: 13px;
+            background: #f7e2a9;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
 
-        /* Modal Overlays */
+        .icon-3d-plans-layer-mid {
+            width: 100%;
+            height: 28px;
+            background: #a27df0;
+            border-top-left-radius: 40% 12px;
+            border-top-right-radius: 40% 12px;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .icon-3d-plans-layer-bot {
+            width: 100%;
+            height: 18px;
+            background: #000000;
+            border-top-left-radius: 50% 10px;
+            border-top-right-radius: 50% 10px;
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-3d-plans-check {
+            width: 10px; height: 6px;
+            border-left: 2px solid #ffffff;
+            border-bottom: 2px solid #ffffff;
+            transform: rotate(-45deg) translate(1px, -1px);
+        }
+
+        .nav-btn.active .icon-3d-home,
+        .nav-btn.active .icon-3d-cal,
+        .nav-btn.active .icon-3d-plans { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+
+        /* Modals */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -572,7 +638,6 @@
                 <div id="greeting-time">Calendar</div>
                 <h1 class="page-title">Events & Plans</h1>
             </div>
-            <!-- RED STAR BUTTON POSITIONED DOWN -->
             <button class="header-icon-btn star-btn" onclick="openImportantModal()" title="View Marked Important Days">
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="var(--star-red)">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
@@ -581,7 +646,6 @@
         </header>
 
         <div class="widget">
-            <!-- iOS STYLE MONTH/YEAR PICKER BUTTON (NO ARROWS) -->
             <div class="calendar-header">
                 <button class="calendar-month-btn" onclick="openIosPickerModal()">
                     <span id="cal-month-year">July 2026</span>
@@ -589,12 +653,9 @@
                 </button>
             </div>
             <div class="cal-grid">
-                <div class="cal-day-name">S</div>
-                <div class="cal-day-name">M</div>
-                <div class="cal-day-name">T</div>
-                <div class="cal-day-name">W</div>
-                <div class="cal-day-name">T</div>
-                <div class="cal-day-name">F</div>
+                <div class="cal-day-name">S</div><div class="cal-day-name">M</div>
+                <div class="cal-day-name">T</div><div class="cal-day-name">W</div>
+                <div class="cal-day-name">T</div><div class="cal-day-name">F</div>
                 <div class="cal-day-name">S</div>
             </div>
             <div class="cal-grid" id="cal-days-grid" style="margin-top: 6px;"></div>
@@ -609,6 +670,43 @@
         </div>
     </div>
 
+    <!-- PAGE 3: FUTURE PLANS & BUDGET PLANNER -->
+    <div class="page-view" id="page-plans">
+        <header>
+            <div>
+                <div id="greeting-time">Future Vision</div>
+                <h1 class="page-title">Plans & Budget</h1>
+            </div>
+        </header>
+
+        <!-- Section 1: Future Purchase Wishlist (Flat Uncategorized) -->
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Near Future Purchases</div>
+                <button class="btn-small" onclick="openAddPurchaseModal()">+ add item</button>
+            </div>
+            <div id="purchases-list" class="schedule-list"></div>
+        </div>
+
+        <!-- Section 2: Monthly Recurring Budget Planner -->
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Monthly Recurring Budget</div>
+                <button class="btn-small" onclick="openAddMonthlyExpenseModal()">+ add bill</button>
+            </div>
+
+            <div class="budget-total-box">
+                <div>
+                    <div style="font-size:11px; color:var(--text-accent); text-transform:uppercase;">Total Monthly Commitments</div>
+                    <div style="font-size:26px; font-weight:700; color:var(--text-primary); margin-top:2px;" id="monthly-total-amount">$0.00</div>
+                </div>
+                <div style="font-size:24px;">💳</div>
+            </div>
+
+            <div id="monthly-expenses-list" class="schedule-list"></div>
+        </div>
+    </div>
+
 </div>
 
 <!-- BOTTOM 3D NAVIGATION BAR -->
@@ -620,6 +718,7 @@
             </svg>
         </div>
     </button>
+
     <button class="nav-btn" id="nav-cal" onclick="switchTab('calendar')">
         <div class="icon-3d-cal">
             <div class="icon-3d-cal-top">
@@ -629,6 +728,16 @@
             <div class="icon-3d-cal-body">
                 <div class="icon-3d-cal-day" id="nav-cal-day-text">SUN</div>
                 <div class="icon-3d-cal-num" id="nav-cal-num-text">8</div>
+            </div>
+        </div>
+    </button>
+
+    <!-- NEW 3D LAYERED ICON FOR FUTURE PLANS PAGE -->
+    <button class="nav-btn" id="nav-plans" onclick="switchTab('plans')">
+        <div class="icon-3d-plans">
+            <div class="icon-3d-plans-layer-mid"></div>
+            <div class="icon-3d-plans-layer-bot">
+                <div class="icon-3d-plans-check"></div>
             </div>
         </div>
     </button>
@@ -676,7 +785,6 @@
         <div class="form-group">
             <label>Tasks for this day (Comma-separated)</label>
             <textarea id="event-tasks-input" class="form-textarea" placeholder="e.g. Buy gifts, Order cake, Reserve table"></textarea>
-            <span style="font-size:11px; color:var(--text-accent);">Each item will convert into its own separate task card on your Homepage!</span>
         </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('event-modal')">Cancel</button>
@@ -685,19 +793,58 @@
     </div>
 </div>
 
-<!-- Modal: View Marked Important Days (Two Parts) -->
+<!-- Modal: View Marked Important Days -->
 <div class="modal-overlay" id="important-modal">
     <div class="modal">
         <h3 class="modal-title" style="color:var(--star-red);">★ Important Days</h3>
-        
         <div class="star-section-title">1. Yearly Recurring Days</div>
         <div id="important-yearly-list"></div>
-
         <div class="star-section-title" style="margin-top:14px;">2. Upcoming Events</div>
         <div id="important-upcoming-list"></div>
-
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('important-modal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Future Purchase -->
+<div class="modal-overlay" id="purchase-modal">
+    <div class="modal">
+        <h3 class="modal-title">Future Purchase Plan</h3>
+        <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" id="purchase-name-input" class="form-input" placeholder="e.g. New Car, Jacket, Shoes...">
+        </div>
+        <div class="form-group">
+            <label>Estimated Cost (Optional)</label>
+            <input type="text" id="purchase-cost-input" class="form-input" placeholder="e.g. $1,200 or $35,000">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('purchase-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewPurchase()">Add to List</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Monthly Expense -->
+<div class="modal-overlay" id="monthly-expense-modal">
+    <div class="modal">
+        <h3 class="modal-title">New Monthly Recurring Expense</h3>
+        <div class="form-group">
+            <label>Name / Service</label>
+            <input type="text" id="monthly-name-input" class="form-input" placeholder="e.g. Electricity Bill, Gym, Netflix">
+        </div>
+        <div class="form-group">
+            <label>Monthly Amount ($)</label>
+            <input type="number" step="0.01" id="monthly-amount-input" class="form-input" placeholder="e.g. 50.00">
+        </div>
+        <div class="form-group">
+            <label>Due Day of Month (Optional)</label>
+            <input type="number" id="monthly-due-input" class="form-input" placeholder="e.g. 1st or 15th" min="1" max="31">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('monthly-expense-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewMonthlyExpense()">Save Expense</button>
         </div>
     </div>
 </div>
@@ -755,20 +902,24 @@
 
 <script>
     function getData() {
-        const data = localStorage.getItem('slimDataV7');
+        const data = localStorage.getItem('slimDataV8');
         return data ? JSON.parse(data) : { 
             userName: 'Slim',
             streak: 0,
-            theme: 'dark',
             verse: '', 
-            events: {}, // Key: YYYY-MM-DD, Value: Array of { title, type: 'yearly'|'upcoming', tasks: [] }
+            events: {}, 
             syncedDates: [],
             schedule: [{ time: '09:00 AM', text: 'Morning Focus' }], 
-            tasks: [{ id: 1, title: 'Build app interface', category: 'Work', priority: 'high', completed: false }] 
+            tasks: [{ id: 1, title: 'Build app interface', category: 'Work', priority: 'high', completed: false }],
+            futurePurchases: [{ name: 'Leather Jacket', cost: '$250' }],
+            monthlyExpenses: [
+                { name: 'Internet Bill', amount: 60.00, dueDay: 5 },
+                { name: 'Gym Membership', amount: 35.00, dueDay: 1 }
+            ]
         };
     }
 
-    function saveData(data) { localStorage.setItem('slimDataV7', JSON.stringify(data)); }
+    function saveData(data) { localStorage.setItem('slimDataV8', JSON.stringify(data)); }
 
     const appData = getData();
     let currentFilter = 'all';
@@ -782,13 +933,16 @@
         if (tab === 'home') {
             document.getElementById('page-home').classList.add('active');
             document.getElementById('nav-home').classList.add('active');
-        } else {
+        } else if (tab === 'calendar') {
             document.getElementById('page-calendar').classList.add('active');
             document.getElementById('nav-cal').classList.add('active');
+        } else if (tab === 'plans') {
+            document.getElementById('page-plans').classList.add('active');
+            document.getElementById('nav-plans').classList.add('active');
         }
     }
 
-    // Auto Sync Calendar Tasks -> Separate homepage task items
+    // Auto Sync Calendar Tasks
     function checkAndAutoSyncCalendarTasks() {
         const now = new Date();
         const curMonthDay = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -886,7 +1040,6 @@
                 dayEl.classList.add('selected');
             }
 
-            // Check for events & yearly birthdays
             let foundFirstName = '';
             let hasEvents = false;
 
@@ -895,7 +1048,7 @@
                     hasEvents = true;
                     appData.events[k].forEach(ev => {
                         if (ev.type === 'yearly' && !foundFirstName) {
-                            foundFirstName = ev.title.split(' ')[0]; // Extract first name
+                            foundFirstName = ev.title.split(' ')[0];
                         }
                     });
                 }
@@ -1004,7 +1157,6 @@
         }
     }
 
-    // iOS Picker Modal Functions
     function openIosPickerModal() {
         const monthSel = document.getElementById('picker-month-select');
         const yearSel = document.getElementById('picker-year-select');
@@ -1035,7 +1187,6 @@
         closeModal('ios-picker-modal');
     }
 
-    // Star Button: Two-Part Important Events Viewer
     function openImportantModal() {
         const yearlyList = document.getElementById('important-yearly-list');
         const upcomingList = document.getElementById('important-upcoming-list');
@@ -1076,6 +1227,125 @@
         if (upcomingCount === 0) upcomingList.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No upcoming one-time events set.</div>';
 
         document.getElementById('important-modal').classList.add('open');
+    }
+
+    // FUTURE PURCHASES & MONTHLY BUDGET RENDERERS
+    function renderFuturePurchases() {
+        const list = document.getElementById('purchases-list');
+        list.innerHTML = '';
+
+        if (!appData.futurePurchases || appData.futurePurchases.length === 0) {
+            list.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No purchase plans added yet.</div>';
+            return;
+        }
+
+        appData.futurePurchases.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'plan-item';
+            div.innerHTML = `
+                <div>
+                    <div class="plan-item-name">${item.name}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span class="plan-item-cost">${item.cost || ''}</span>
+                    <button class="schedule-delete" onclick="deletePurchase(${index})">&times;</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function openAddPurchaseModal() {
+        document.getElementById('purchase-name-input').value = '';
+        document.getElementById('purchase-cost-input').value = '';
+        document.getElementById('purchase-modal').classList.add('open');
+    }
+
+    function saveNewPurchase() {
+        const name = document.getElementById('purchase-name-input').value.trim();
+        const cost = document.getElementById('purchase-cost-input').value.trim();
+
+        if (name) {
+            if (!appData.futurePurchases) appData.futurePurchases = [];
+            appData.futurePurchases.push({ name, cost });
+            saveData(appData);
+            renderFuturePurchases();
+            closeModal('purchase-modal');
+        }
+    }
+
+    function deletePurchase(index) {
+        appData.futurePurchases.splice(index, 1);
+        saveData(appData);
+        renderFuturePurchases();
+    }
+
+    function renderMonthlyExpenses() {
+        const list = document.getElementById('monthly-expenses-list');
+        const totalEl = document.getElementById('monthly-total-amount');
+        list.innerHTML = '';
+
+        if (!appData.monthlyExpenses || appData.monthlyExpenses.length === 0) {
+            list.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No recurring monthly expenses set.</div>';
+            totalEl.textContent = '$0.00';
+            return;
+        }
+
+        let total = 0;
+        appData.monthlyExpenses.forEach((item, index) => {
+            total += parseFloat(item.amount) || 0;
+
+            const div = document.createElement('div');
+            div.className = 'plan-item';
+            const dueText = item.dueDay ? `Due on the ${item.dueDay}${getOrdinal(item.dueDay)}` : 'Monthly recurring';
+
+            div.innerHTML = `
+                <div>
+                    <div class="plan-item-name">${item.name}</div>
+                    <div style="font-size:11px; color:var(--text-accent); margin-top:2px;">${dueText}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span class="plan-item-cost" style="color:var(--text-primary);">$${parseFloat(item.amount).toFixed(2)}</span>
+                    <button class="schedule-delete" onclick="deleteMonthlyExpense(${index})">&times;</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+
+        totalEl.textContent = `$${total.toFixed(2)}`;
+    }
+
+    function getOrdinal(n) {
+        const s = ["th", "st", "nd", "rd"];
+        const v = n % 100;
+        return s[(v - 20) % 10] || s[v] || s[0];
+    }
+
+    function openAddMonthlyExpenseModal() {
+        document.getElementById('monthly-name-input').value = '';
+        document.getElementById('monthly-amount-input').value = '';
+        document.getElementById('monthly-due-input').value = '';
+        document.getElementById('monthly-expense-modal').classList.add('open');
+    }
+
+    function saveNewMonthlyExpense() {
+        const name = document.getElementById('monthly-name-input').value.trim();
+        const amount = parseFloat(document.getElementById('monthly-amount-input').value);
+        const dueDay = parseInt(document.getElementById('monthly-due-input').value, 10);
+
+        if (name && !isNaN(amount)) {
+            if (!appData.monthlyExpenses) appData.monthlyExpenses = [];
+            appData.monthlyExpenses.push({ name, amount, dueDay: dueDay || null });
+            saveData(appData);
+            renderMonthlyExpenses();
+            closeModal('monthly-expense-modal');
+        }
+    }
+
+    function deleteMonthlyExpense(index) {
+        appData.monthlyExpenses.splice(index, 1);
+        saveData(appData);
+        renderMonthlyExpenses();
     }
 
     // Schedule System
@@ -1204,14 +1474,15 @@
         closeModal('settings-modal');
     }
 
-    // Init App
+    // Init Application
     updateHeader();
     checkAndAutoSyncCalendarTasks();
     renderCalendar();
     renderSchedule();
     renderTasks();
+    renderFuturePurchases();
+    renderMonthlyExpenses();
 </script>
 
 </body>
 </html>
- 
