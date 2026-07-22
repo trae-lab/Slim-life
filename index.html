@@ -1,481 +1,1491 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Dashboard</title>
-  <style>
-    :root {
-      --bg-color: #121214;
-      --card-bg: #1e1e22;
-      --text-color: #ffffff;
-      --text-muted: #a1a1aa;
-      --border-color: #27272a;
-      --accent-color: #ffffff;
-      --input-bg: #141416;
-      --green: #4ade80;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard - Slim</title>
+    <style>
+        :root {
+            --bg-color: #0b0b0d;
+            --widget-bg: #161619;
+            --task-bg: #222226;
+            --modal-bg: #1c1c20;
+            --text-primary: #ffffff;
+            --text-secondary: #999999;
+            --text-accent: #666666;
+            --border-color: #333333;
+            --border-radius: 24px;
+            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            --accent-color: #ff5e3a;
+            --star-red: #ff3b30;
+            --gold-accent: #f7d070;
+            --purple-accent: #9d73f7;
+        }
 
-    [data-theme="light"] {
-      --bg-color: #f4f4f5;
-      --card-bg: #ffffff;
-      --text-color: #18181b;
-      --text-muted: #71717a;
-      --border-color: #e4e4e7;
-      --accent-color: #18181b;
-      --input-bg: #f4f4f5;
-      --green: #16a34a;
-    }
+        body.light-theme {
+            --bg-color: #f2f2f7;
+            --widget-bg: #ffffff;
+            --task-bg: #e5e5ea;
+            --modal-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --text-accent: #8e8e93;
+            --border-color: #d1d1d6;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: background-color 0.3s, color 0.3s;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 24px 16px 100px 16px;
+            display: flex;
+            justify-content: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-    /* --- Navigation Bar --- */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 32px;
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-    }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
 
-    .nav-links {
-      display: flex;
-      gap: 20px;
-    }
+        /* Page View Switcher */
+        .page-view {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+        }
 
-    .nav-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
+        .page-view.active {
+            display: flex;
+        }
 
-    .nav-btn.active, .nav-btn:hover {
-      color: var(--text-color);
-      background: var(--input-bg);
-    }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
 
-    .theme-toggle {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 500;
-    }
+        #greeting-time {
+            font-size: 20px;
+            font-weight: 300;
+            color: var(--text-secondary);
+        }
 
-    /* --- 3D Icon Styles --- */
-    .icon-3d-notes {
-      width: 24px;
-      height: 24px;
-      background: #2a2a2e;
-      border-radius: 6px;
-      border-top: 5px solid #f2f2f7;
-      box-shadow: 0 4px 0 #000, 0 6px 10px rgba(0,0,0,0.4);
-      transform: perspective(300px) rotateX(10deg);
-      display: inline-block;
-    }
+        h1.page-title {
+            font-size: 42px;
+            font-weight: 400;
+            margin: 2px 0 0;
+            letter-spacing: -0.5px;
+        }
 
-    .icon-3d-budget {
-      width: 26px;
-      height: 22px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(4px);
-      border-radius: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transform: perspective(300px) rotateY(-10deg) rotateX(5deg);
-      display: inline-block;
-    }
+        .header-icon-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+        }
 
-    /* --- Layout Container --- */
-    main {
-      padding: 32px;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      flex: 1;
-    }
+        .star-btn { margin-top: 14px; }
 
-    .page {
-      display: none;
-    }
+        .gear-icon svg, .star-btn svg {
+            filter: drop-shadow(0px 4px 10px rgba(255, 59, 48, 0.3));
+            transition: transform 0.2s ease;
+        }
 
-    .page.active {
-      display: block;
-    }
+        .header-icon-btn:active svg { transform: scale(0.9) rotate(15deg); }
 
-    .page-title {
-      font-size: 28px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
 
-    /* --- Common UI Components --- */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
+        .widget {
+            background-color: var(--widget-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
+        .widget-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-accent);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
 
-    .btn {
-      background: var(--text-color);
-      color: var(--bg-color);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+        #today-mon { font-size: 22px; font-weight: 300; color: var(--text-secondary); }
 
-    .btn-sm {
-      padding: 4px 10px;
-      font-size: 12px;
-    }
+        #today-date {
+            font-size: 64px;
+            font-weight: 300;
+            line-height: 1;
+            margin: 4px 0 16px;
+        }
 
-    .btn-danger {
-      background: none;
-      border: none;
-      color: #ef4444;
-      cursor: pointer;
-      font-weight: bold;
-    }
+        .streak-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
 
-    .item-row {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        .text-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 17px;
+            font-weight: 300;
+            resize: none;
+            padding: 0;
+            margin-top: 4px;
+            line-height: 1.4;
+            font-family: inherit;
+        }
 
-    .progress-bar {
-      height: 6px;
-      background: var(--border-color);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
+        .text-input:focus { outline: none; color: var(--text-primary); }
 
-    .progress-fill {
-      height: 100%;
-      background: var(--accent-color);
-    }
+        #verse-input { height: 90px; }
 
-    .badge {
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: var(--border-color);
-      color: var(--text-muted);
-    }
+        /* Calendar Styling */
+        .calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+        }
 
-    .flex-between {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
+        .calendar-month-btn {
+            font-size: 20px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .grid-2 { grid-template-columns: 1fr; }
-      nav { flex-direction: column; gap: 16px; }
-    }
-  </style>
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            text-align: center;
+        }
+
+        .cal-day-name {
+            font-size: 12px;
+            color: var(--text-accent);
+            font-weight: 600;
+            padding-bottom: 6px;
+        }
+
+        .cal-day {
+            min-height: 52px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding-top: 6px;
+            border-radius: 14px;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            color: var(--text-primary);
+            background-color: var(--task-bg);
+            transition: transform 0.15s ease, background-color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .cal-day.today { border: 2px solid var(--accent-color); font-weight: bold; }
+
+        .cal-day.selected {
+            background-color: var(--accent-color) !important;
+            color: #ffffff !important;
+        }
+
+        .cal-day-name-tag {
+            font-size: 9px;
+            color: var(--star-red);
+            font-weight: 700;
+            margin-top: 2px;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 2px;
+        }
+
+        .cal-day.selected .cal-day-name-tag { color: #ffffff; }
+
+        .cal-day.has-event::after {
+            content: ''; width: 4px; height: 4px;
+            background-color: var(--star-red);
+            border-radius: 50%; position: absolute; bottom: 3px;
+        }
+
+        /* Schedule & Lists */
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .btn-small {
+            background-color: var(--task-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .schedule-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background-color: var(--task-bg);
+            padding: 12px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+        }
+
+        .schedule-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .schedule-time { color: var(--accent-color); font-size: 12px; font-weight: 600; }
+        .schedule-text { font-weight: 500; color: var(--text-primary); }
+        .schedule-delete { background: none; border: none; color: var(--text-accent); cursor: pointer; font-size: 16px; }
+
+        /* Tasks Styling */
+        .tasks-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .task-filters { display: flex; gap: 8px; margin-bottom: 12px; }
+        .filter-btn {
+            background: none; border: none; color: var(--text-accent);
+            font-size: 12px; cursor: pointer; padding: 2px 8px; border-radius: 8px;
+        }
+        .filter-btn.active { background-color: var(--task-bg); color: var(--text-primary); }
+
+        #task-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+
+        .task-item {
+            background-color: var(--task-bg);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .task-left { display: flex; align-items: center; gap: 12px; }
+        .task-checkbox {
+            width: 22px; height: 22px; border: 2px solid var(--text-accent);
+            border-radius: 50%; background-color: transparent; cursor: pointer;
+        }
+
+        .task-content { display: flex; flex-direction: column; }
+        .task-title { font-size: 15px; color: var(--text-primary); }
+        .task-meta { font-size: 11px; color: var(--text-accent); margin-top: 2px; display: flex; gap: 6px; align-items: center; }
+
+        .badge { padding: 1px 6px; border-radius: 6px; font-size: 10px; text-transform: uppercase; }
+        .badge-high { background-color: rgba(255, 94, 58, 0.2); color: #ff5e3a; }
+        .badge-medium { background-color: rgba(255, 184, 0, 0.2); color: #ffb800; }
+        .badge-low { background-color: rgba(0, 200, 81, 0.2); color: #00c851; }
+
+        .task-delete { background: none; border: none; color: var(--text-accent); font-size: 18px; padding: 0 4px; cursor: pointer; }
+        .task-item.completed .task-title { text-decoration: line-through; color: var(--text-accent); }
+        .task-item.completed .task-checkbox { border-color: var(--text-accent); background-color: var(--text-accent); }
+
+        /* Future Plans & Expense Cards */
+        .plan-item {
+            background-color: var(--task-bg);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .plan-item:active { background-color: rgba(255, 255, 255, 0.08); }
+        .plan-item-name { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+        .plan-item-cost { font-size: 14px; font-weight: 600; color: var(--accent-color); }
+
+        .budget-total-box {
+            background: linear-gradient(135deg, rgba(157, 115, 247, 0.15), rgba(255, 94, 58, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        /* Sub-item Details Table */
+        .sub-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--task-bg);
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 440px;
+            background-color: rgba(22, 22, 25, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 28px;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            z-index: 90;
+        }
+
+        .nav-btn {
+            background: none; border: none; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-btn:active { transform: scale(0.9); }
+
+        .icon-3d-home {
+            width: 44px; height: 44px;
+            background: linear-gradient(145deg, #232328, #101013);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5); color: #ffffff;
+        }
+
+        .icon-3d-cal {
+            width: 44px; height: 44px;
+            background: #ffffff; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center;
+            overflow: hidden; position: relative;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .icon-3d-cal-top {
+            width: 100%; height: 18px;
+            background: linear-gradient(135deg, #ff7a00, #ff004c);
+            display: flex; justify-content: space-around; align-items: center; padding: 0 6px;
+        }
+
+        .icon-3d-cal-binder { width: 4px; height: 6px; background: #ffffff; border-radius: 2px; }
+        .icon-3d-cal-body { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .icon-3d-cal-day { font-size: 7px; color: #ff004c; font-weight: 700; text-transform: uppercase; line-height: 1; }
+        .icon-3d-cal-num { font-size: 14px; color: #000000; font-weight: 800; line-height: 1; }
+
+        .icon-3d-plans {
+            width: 44px; height: 44px;
+            border-radius: 13px; background: #f7e2a9;
+            position: relative; overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+
+        .icon-3d-plans-layer-mid {
+            width: 100%; height: 28px; background: #a27df0;
+            border-top-left-radius: 40% 12px; border-top-right-radius: 40% 12px;
+            position: absolute; bottom: 0;
+        }
+
+        .icon-3d-plans-layer-bot {
+            width: 100%; height: 18px; background: #000000;
+            border-top-left-radius: 50% 10px; border-top-right-radius: 50% 10px;
+            position: absolute; bottom: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .icon-3d-plans-check {
+            width: 10px; height: 6px;
+            border-left: 2px solid #ffffff; border-bottom: 2px solid #ffffff;
+            transform: rotate(-45deg) translate(1px, -1px);
+        }
+
+        .nav-btn.active .icon-3d-home,
+        .nav-btn.active .icon-3d-cal,
+        .nav-btn.active .icon-3d-plans { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex; justify-content: center; align-items: flex-end;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 100;
+        }
+
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .modal {
+            background-color: var(--modal-bg);
+            width: 100%; max-width: 480px;
+            border-top-left-radius: 28px; border-top-right-radius: 28px;
+            padding: 24px; display: flex; flex-direction: column; gap: 16px;
+            transform: translateY(100%); transition: transform 0.25s ease;
+            max-height: 85vh; overflow-y: auto;
+        }
+
+        .modal-overlay.open .modal { transform: translateY(0); }
+        .modal-title { font-size: 18px; font-weight: 600; margin: 0 0 4px 0; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 12px; color: var(--text-accent); text-transform: uppercase; }
+
+        .form-input, .form-select, .form-textarea {
+            background-color: var(--task-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 12px;
+            color: var(--text-primary); font-size: 15px; outline: none; font-family: inherit;
+        }
+
+        .modal-buttons { display: flex; gap: 10px; margin-top: 8px; }
+
+        .btn-primary {
+            flex: 1; background-color: var(--text-primary); color: var(--bg-color);
+            border: none; border-radius: 14px; padding: 12px; font-weight: 600; cursor: pointer;
+        }
+
+        .btn-secondary {
+            flex: 1; background-color: var(--task-bg); color: var(--text-primary);
+            border: none; border-radius: 14px; padding: 12px; cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- NAVIGATION -->
-  <nav>
-    <div class="nav-links">
-      <button class="nav-btn active" onclick="switchPage('notes-page', this)">
-        <span class="icon-3d-notes"></span> Notes & Goals
-      </button>
-      <button class="nav-btn" onclick="switchPage('budget-page', this)">
-        <span class="icon-3d-budget"></span> Budget Planner
-      </button>
-      <button class="nav-btn" onclick="switchPage('calendar-page', this)">📅 Calendar</button>
-      <button class="nav-btn" onclick="switchPage('tasks-page', this)">✅ Tasks</button>
+<div class="container">
+
+    <!-- PAGE 1: HOME DASHBOARD -->
+    <div class="page-view active" id="page-home">
+        <header>
+            <div>
+                <div id="greeting-time">Good evening</div>
+                <h1 class="page-title" id="user-name">Slim</h1>
+            </div>
+            <button class="header-icon-btn gear-icon" onclick="openSettingsModal()">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23-0.41-0.12-0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                </svg>
+            </button>
+        </header>
+
+        <div class="grid-2">
+            <div class="widget">
+                <div class="widget-label">Today</div>
+                <div id="today-mon">Mon</div>
+                <div id="today-date">20</div>
+                <div class="streak-info">🔥 <span id="streak-count">0</span> day streak</div>
+            </div>
+
+            <div class="widget">
+                <div class="widget-label">The Week's Verse</div>
+                <textarea id="verse-input" class="text-input" placeholder="Enter verse..."></textarea>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Today's Schedule</div>
+                <button class="btn-small" onclick="addScheduleItem()">+ time</button>
+            </div>
+            <div class="schedule-list" id="schedule-list"></div>
+        </div>
+
+        <div class="widget">
+            <div class="tasks-header">
+                <div class="widget-label" style="margin:0;">Today's Tasks</div>
+                <button class="btn-small" onclick="openAddTaskModal()">+ add</button>
+            </div>
+            <div class="task-filters">
+                <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+                <button class="filter-btn" onclick="setFilter('active', this)">Active</button>
+                <button class="filter-btn" onclick="setFilter('completed', this)">Done</button>
+            </div>
+            <ul id="task-list"></ul>
+        </div>
     </div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
-  </nav>
 
-  <main>
-    <!-- ================= NOTES & GOALS PAGE ================= -->
-    <div id="notes-page" class="page active">
-      <h1 class="page-title"><span class="icon-3d-notes"></span> Notes & Goals</h1>
-      
-      <div class="grid-2">
-        <!-- Notes Section -->
-        <div class="card">
-          <div class="flex-between">
-            <h2>Notes</h2>
-            <button class="btn btn-sm" onclick="addNote()">+ Add Note</button>
-          </div>
-          <div id="notes-list"></div>
+    <!-- PAGE 2: FULL CALENDAR PAGE -->
+    <div class="page-view" id="page-calendar">
+        <header>
+            <div>
+                <div id="greeting-time">Calendar</div>
+                <h1 class="page-title">Events & Plans</h1>
+            </div>
+            <button class="header-icon-btn star-btn" onclick="openImportantModal()" title="View Marked Important Days">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="var(--star-red)">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+            </button>
+        </header>
+
+        <div class="widget">
+            <div class="calendar-header">
+                <button class="calendar-month-btn" onclick="openIosPickerModal()">
+                    <span id="cal-month-year">July 2026</span>
+                    <span style="font-size:12px; opacity:0.6;">▼</span>
+                </button>
+            </div>
+            <div class="cal-grid">
+                <div class="cal-day-name">S</div><div class="cal-day-name">M</div>
+                <div class="cal-day-name">T</div><div class="cal-day-name">W</div>
+                <div class="cal-day-name">T</div><div class="cal-day-name">F</div>
+                <div class="cal-day-name">S</div>
+            </div>
+            <div class="cal-grid" id="cal-days-grid" style="margin-top: 6px;"></div>
         </div>
 
-        <!-- Goals Section -->
-        <div class="card">
-          <div class="flex-between">
-            <h2>Goals</h2>
-            <button class="btn btn-sm" onclick="addGoal()">+ Add Goal</button>
-          </div>
-          <div id="goals-list"></div>
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;" id="agenda-date-title">Selected Day Agenda</div>
+                <button class="btn-small" onclick="openAddEventModal()">+ add event</button>
+            </div>
+            <div class="schedule-list" id="agenda-event-list"></div>
         </div>
-      </div>
     </div>
 
-    <!-- ================= BUDGET PLANNER PAGE ================= -->
-    <div id="budget-page" class="page">
-      <h1 class="page-title"><span class="icon-3d-budget"></span> Budget Planner</h1>
+    <!-- PAGE 3: PLANS & BUDGET PLANNER -->
+    <div class="page-view" id="page-plans">
+        <header>
+            <div>
+                <div id="greeting-time">Future Vision</div>
+                <h1 class="page-title">Plans & Budget</h1>
+            </div>
+        </header>
 
-      <!-- Project Budgets -->
-      <div class="card">
-        <div class="flex-between">
-          <div>
-            <h2>Project Budgets</h2>
-            <p style="color: var(--text-muted); font-size: 13px;">Draft budgets for upcoming projects and track spending.</p>
-          </div>
-          <button class="btn btn-sm" onclick="addProjectBudget()">+ Draft Project Budget</button>
+        <!-- Summary Header -->
+        <div class="budget-total-box">
+            <div>
+                <div style="font-size:11px; color:var(--text-accent); text-transform:uppercase;">Total Monthly Commitment</div>
+                <div style="font-size:26px; font-weight:700; color:var(--text-primary); margin-top:2px;" id="monthly-total-amount">$0.00</div>
+            </div>
+            <div style="font-size:24px;">💳</div>
         </div>
-        <div id="projects-list"></div>
-      </div>
 
-      <!-- Recurring Spendings -->
-      <div class="card">
-        <div class="flex-between">
-          <h2>Monthly Recurring Spendings</h2>
-          <button class="btn btn-sm" onclick="addRecurringExpense()">+ Add Monthly Expense</button>
+        <!-- Section 1: Future Wishlist -->
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Near Future Purchases</div>
+                <button class="btn-small" onclick="openAddPurchaseModal()">+ add item</button>
+            </div>
+            <div id="purchases-list" class="schedule-list"></div>
         </div>
+
+        <!-- Section 2: Bills -->
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Monthly Bills</div>
+                <button class="btn-small" onclick="openAddExpenseModal('bills')">+ add bill</button>
+            </div>
+            <div id="bills-list" class="schedule-list"></div>
+        </div>
+
+        <!-- Section 3: Monthly Subscriptions -->
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Subscriptions</div>
+                <button class="btn-small" onclick="openAddExpenseModal('subscriptions')">+ add sub</button>
+            </div>
+            <div id="subscriptions-list" class="schedule-list"></div>
+        </div>
+
+        <!-- Section 4: Shopping Lists -->
+        <div class="widget">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Shopping & Grocery Lists</div>
+                <button class="btn-small" onclick="openAddExpenseModal('shopping')">+ add list</button>
+            </div>
+            <div id="shopping-list" class="schedule-list"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- BOTTOM 3D NAVIGATION BAR -->
+<div class="bottom-nav-container">
+    <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
+        <div class="icon-3d-home">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+        </div>
+    </button>
+
+    <button class="nav-btn" id="nav-cal" onclick="switchTab('calendar')">
+        <div class="icon-3d-cal">
+            <div class="icon-3d-cal-top">
+                <div class="icon-3d-cal-binder"></div>
+                <div class="icon-3d-cal-binder"></div>
+            </div>
+            <div class="icon-3d-cal-body">
+                <div class="icon-3d-cal-day" id="nav-cal-day-text">SUN</div>
+                <div class="icon-3d-cal-num" id="nav-cal-num-text">8</div>
+            </div>
+        </div>
+    </button>
+
+    <button class="nav-btn" id="nav-plans" onclick="switchTab('plans')">
+        <div class="icon-3d-plans">
+            <div class="icon-3d-plans-layer-mid"></div>
+            <div class="icon-3d-plans-layer-bot">
+                <div class="icon-3d-plans-check"></div>
+            </div>
+        </div>
+    </button>
+</div>
+
+<!-- MODALS -->
+
+<!-- Modal: Add New Main Category Expense Entry -->
+<div class="modal-overlay" id="add-expense-modal">
+    <div class="modal">
+        <h3 class="modal-title" id="expense-modal-title">New Item</h3>
+        <input type="hidden" id="expense-category-type">
+        <div class="form-group">
+            <label>Name / Title</label>
+            <input type="text" id="expense-name-input" class="form-input" placeholder="e.g. Internet, Groceries, Netflix">
+        </div>
+        <div class="form-group">
+            <label>Base Price / Estimated Amount ($)</label>
+            <input type="number" step="0.01" id="expense-amount-input" class="form-input" placeholder="0.00">
+        </div>
+        <div class="form-group">
+            <label>Due Day of Month (Optional)</label>
+            <input type="number" id="expense-due-input" class="form-input" placeholder="e.g. 5th" min="1" max="31">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('add-expense-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewCategoryExpense()">Save Entry</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Item Detail List View (Shopping Items, Sub-breakdown) -->
+<div class="modal-overlay" id="item-details-modal">
+    <div class="modal">
+        <h3 class="modal-title" id="detail-item-title">List Items</h3>
+        <div style="font-size:12px; color:var(--text-accent);" id="detail-item-subtitle">Manage items inside this entry</div>
         
-        <div id="recurring-list"></div>
+        <div id="sub-items-container" style="margin-top:10px;"></div>
 
-        <div style="margin-top: 20px; padding: 16px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color);" class="flex-between">
-          <strong>Total Monthly Overhead:</strong>
-          <strong id="recurring-total" style="color: var(--green); font-size: 18px;">$0.00</strong>
+        <hr style="border:0; border-top:1px solid var(--border-color); margin:12px 0;">
+
+        <div style="font-weight:600; font-size:14px; margin-bottom:8px;">Add Item to List:</div>
+        <div class="form-group">
+            <input type="text" id="sub-name-input" class="form-input" placeholder="Item name (e.g. Milk, Router Fee)">
         </div>
-      </div>
-    </div>
-
-    <!-- ================= CALENDAR PAGE ================= -->
-    <div id="calendar-page" class="page">
-      <h1 class="page-title">📅 Calendar</h1>
-      <div class="card">
-        <p style="color: var(--text-muted);">Calendar view active.</p>
-      </div>
-    </div>
-
-    <!-- ================= TASKS PAGE ================= -->
-    <div id="tasks-page" class="page">
-      <h1 class="page-title">✅ Tasks</h1>
-      <div class="card">
-        <p style="color: var(--text-muted);">Task management view active.</p>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    // --- State Management ---
-    let appState = JSON.parse(localStorage.getItem('dashboard_state')) || {
-      theme: 'dark',
-      notes: [{ id: 1, title: 'Dashboard Setup', content: 'Configure notes and budget planner pages.' }],
-      goals: [{ id: 1, title: 'Launch Website', progress: 80 }],
-      projects: [{ id: 1, name: 'Setup Home Office', budget: 1000, spent: 450 }],
-      recurring: [
-        { id: 1, name: 'Electric Bill', category: 'Bills', cost: 120 },
-        { id: 2, name: 'Cloud Hosting', category: 'Subscriptions', cost: 20 },
-        { id: 3, name: 'Groceries', category: 'Shopping', cost: 400 }
-      ]
-    };
-
-    function saveState() {
-      localStorage.setItem('dashboard_state', JSON.stringify(appState));
-      render();
-    }
-
-    // --- Navigation ---
-    function switchPage(pageId, btn) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-      btn.classList.add('active');
-    }
-
-    // --- Theme Toggle ---
-    function toggleTheme() {
-      appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', appState.theme);
-      saveState();
-    }
-
-    // Initialize Theme
-    document.documentElement.setAttribute('data-theme', appState.theme || 'dark');
-
-    // --- Dynamic Render Functions ---
-    function render() {
-      // Render Notes
-      const notesList = document.getElementById('notes-list');
-      notesList.innerHTML = appState.notes.map(n => `
-        <div class="item-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-          <div style="display:flex; justify-content:space-between; width:100%;">
-            <strong>${n.title}</strong>
-            <button class="btn-danger" onclick="deleteItem('notes', ${n.id})">✕</button>
-          </div>
-          <div style="font-size: 13px; color: var(--text-muted);">${n.content}</div>
+        <div class="ios-picker-row" style="margin-top:6px;">
+            <input type="number" id="sub-qty-input" class="form-input" placeholder="Qty (e.g. 2)" value="1">
+            <input type="number" step="0.01" id="sub-price-input" class="form-input" placeholder="Price ($)">
         </div>
-      `).join('');
 
-      // Render Goals
-      const goalsList = document.getElementById('goals-list');
-      goalsList.innerHTML = appState.goals.map(g => `
-        <div class="item-row" style="display:block;">
-          <div class="flex-between">
-            <span>${g.title}</span>
-            <div>
-              <span class="badge">${g.progress}%</span>
-              <button class="btn-danger" onclick="deleteItem('goals', ${g.id})">✕</button>
-            </div>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" style="width: ${g.progress}%;"></div></div>
+        <button class="btn-primary" style="margin-top:10px; width:100%;" onclick="addSubItemToDetail()">+ Add Item</button>
+
+        <div class="modal-buttons" style="margin-top:12px;">
+            <button class="btn-secondary" onclick="closeModal('item-details-modal')">Close</button>
         </div>
-      `).join('');
+    </div>
+</div>
 
-      // Render Project Budgets
-      const projectsList = document.getElementById('projects-list');
-      projectsList.innerHTML = appState.projects.map(p => {
-        const pct = Math.min(Math.round((p.spent / p.budget) * 100), 100);
-        return `
-          <div class="item-row" style="display:block;">
-            <div class="flex-between">
-              <strong>${p.name}</strong>
-              <div>
-                <span style="font-size: 13px; color: var(--text-muted);">$${p.spent} / $${p.budget} Spent</span>
-                <button class="btn-danger" onclick="addProjectExpense(${p.id})">+$</button>
-                <button class="btn-danger" onclick="deleteItem('projects', ${p.id})">✕</button>
-              </div>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%;"></div></div>
-          </div>
-        `;
-      }).join('');
+<!-- Other System Modals -->
+<div class="modal-overlay" id="ios-picker-modal">
+    <div class="modal">
+        <h3 class="modal-title">Select Month & Year</h3>
+        <div class="ios-picker-row">
+            <select id="picker-month-select" class="form-select">
+                <option value="0">January</option><option value="1">February</option>
+                <option value="2">March</option><option value="3">April</option>
+                <option value="4">May</option><option value="5">June</option>
+                <option value="6">July</option><option value="7">August</option>
+                <option value="8">September</option><option value="9">October</option>
+                <option value="10">November</option><option value="11">December</option>
+            </select>
+            <select id="picker-year-select" class="form-select"></select>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('ios-picker-modal')">Cancel</button>
+            <button class="btn-primary" onclick="applyIosMonthYear()">Apply</button>
+        </div>
+    </div>
+</div>
 
-      // Render Recurring Spendings
-      const recurringList = document.getElementById('recurring-list');
-      let totalCost = 0;
-      recurringList.innerHTML = appState.recurring.map(r => {
-        totalCost += Number(r.cost);
-        return `
-          <div class="item-row">
-            <div>
-              <span>${r.name}</span>
-              <span class="badge" style="margin-left: 8px;">${r.category}</span>
-            </div>
-            <div>
-              <strong>$${r.cost}/mo</strong>
-              <button class="btn-danger" onclick="deleteItem('recurring', ${r.id})">✕</button>
-            </div>
-          </div>
-        `;
-      }).join('');
+<div class="modal-overlay" id="event-modal">
+    <div class="modal">
+        <h3 class="modal-title">Mark Day / Event</h3>
+        <div class="form-group">
+            <label>Event Name / Highlight</label>
+            <input type="text" id="event-title-input" class="form-input" placeholder="e.g. Slim's Birthday">
+        </div>
+        <div class="form-group">
+            <label>Event Type</label>
+            <select id="event-recurring-input" class="form-select">
+                <option value="yearly">★ Recurring Yearly</option>
+                <option value="upcoming">🗓 Upcoming Event</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tasks for this day (Comma-separated)</label>
+            <textarea id="event-tasks-input" class="form-textarea" placeholder="e.g. Buy gifts, Reserve table"></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('event-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewCalendarEvent()">Save Event</button>
+        </div>
+    </div>
+</div>
 
-      document.getElementById('recurring-total').innerText = `$${totalCost.toFixed(2)}`;
+<div class="modal-overlay" id="important-modal">
+    <div class="modal">
+        <h3 class="modal-title" style="color:var(--star-red);">★ Important Days</h3>
+        <div class="star-section-title">1. Yearly Recurring Days</div>
+        <div id="important-yearly-list"></div>
+        <div class="star-section-title" style="margin-top:14px;">2. Upcoming Events</div>
+        <div id="important-upcoming-list"></div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('important-modal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="purchase-modal">
+    <div class="modal">
+        <h3 class="modal-title">Future Purchase Plan</h3>
+        <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" id="purchase-name-input" class="form-input" placeholder="e.g. New Car, Jacket">
+        </div>
+        <div class="form-group">
+            <label>Estimated Cost (Optional)</label>
+            <input type="text" id="purchase-cost-input" class="form-input" placeholder="e.g. $1,200">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('purchase-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewPurchase()">Add to List</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="task-modal">
+    <div class="modal">
+        <h3 class="modal-title">New Task</h3>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="task-title-input" class="form-input" placeholder="What needs to be done?">
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select id="task-cat-input" class="form-select">
+                <option value="Personal">Personal</option>
+                <option value="Work">Work</option>
+                <option value="Health">Health</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Priority</label>
+            <select id="task-prio-input" class="form-select">
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewTask()">Add Task</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+        <h3 class="modal-title">Settings</h3>
+        <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="setting-name-input" class="form-input">
+        </div>
+        <div class="form-group">
+            <label>Current Streak (Days)</label>
+            <input type="number" id="setting-streak-input" class="form-input">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getData() {
+        const data = localStorage.getItem('slimDataV9');
+        return data ? JSON.parse(data) : { 
+            userName: 'Slim',
+            streak: 0,
+            verse: '', 
+            events: {}, 
+            syncedDates: [],
+            schedule: [{ time: '09:00 AM', text: 'Morning Focus' }], 
+            tasks: [{ id: 1, title: 'Build app interface', category: 'Work', priority: 'high', completed: false }],
+            futurePurchases: [{ name: 'Leather Jacket', cost: '$250' }],
+            bills: [
+                { id: 1, name: 'Internet Bill', amount: 60.00, dueDay: 5, items: [{ name: 'Router Fee', qty: 1, price: 60.00 }] }
+            ],
+            subscriptions: [
+                { id: 2, name: 'Netflix', amount: 15.99, dueDay: 12, items: [] }
+            ],
+            shopping: [
+                { id: 3, name: 'Monthly Groceries', amount: 150.00, dueDay: 1, items: [{ name: 'Steak', qty: 2, price: 20.00 }, { name: 'Rice', qty: 1, price: 10.00 }] }
+            ]
+        };
     }
 
-    // --- Action Handlers ---
-    function addNote() {
-      const title = prompt('Note Title:');
-      const content = prompt('Note Content:');
-      if (title) {
-        appState.notes.push({ id: Date.now(), title, content: content || '' });
-        saveState();
-      }
-    }
+    function saveData(data) { localStorage.setItem('slimDataV9', JSON.stringify(data)); }
 
-    function addGoal() {
-      const title = prompt('Goal Title:');
-      const progress = prompt('Initial Progress (0-100%):', '0');
-      if (title) {
-        appState.goals.push({ id: Date.now(), title, progress: Number(progress) || 0 });
-        saveState();
-      }
-    }
+    const appData = getData();
+    let currentFilter = 'all';
+    let calDate = new Date();
+    let selectedDateKey = '';
+    let activeDetailObj = null; 
 
-    function addProjectBudget() {
-      const name = prompt('Project Name:');
-      const budget = prompt('Draft Budget Amount ($):');
-      if (name && budget) {
-        appState.projects.push({ id: Date.now(), name, budget: Number(budget), spent: 0 });
-        saveState();
-      }
-    }
+    function switchTab(tab) {
+        document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-    function addProjectExpense(id) {
-      const amount = prompt('Add spending amount to project ($):');
-      if (amount) {
-        const project = appState.projects.find(p => p.id === id);
-        if (project) {
-          project.spent += Number(amount);
-          saveState();
+        if (tab === 'home') {
+            document.getElementById('page-home').classList.add('active');
+            document.getElementById('nav-home').classList.add('active');
+        } else if (tab === 'calendar') {
+            document.getElementById('page-calendar').classList.add('active');
+            document.getElementById('nav-cal').classList.add('active');
+        } else if (tab === 'plans') {
+            document.getElementById('page-plans').classList.add('active');
+            document.getElementById('nav-plans').classList.add('active');
         }
-      }
     }
 
-    function addRecurringExpense() {
-      const name = prompt('Expense Name:');
-      const category = prompt('Category (Bills, Subscriptions, Shopping):', 'Bills');
-      const cost = prompt('Monthly Amount ($):');
-      if (name && cost) {
-        appState.recurring.push({ id: Date.now(), name, category: category || 'Bills', cost: Number(cost) });
-        saveState();
-      }
+    function updateHeader() {
+        const now = new Date();
+        const hours = now.getHours();
+        let greeting = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
+
+        document.getElementById('greeting-time').textContent = greeting;
+        document.getElementById('user-name').textContent = appData.userName || 'Slim';
+        document.getElementById('streak-count').textContent = appData.streak || 0;
+
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        document.getElementById('today-mon').textContent = days[now.getDay()];
+        document.getElementById('today-date').textContent = now.getDate();
+        document.getElementById('nav-cal-day-text').textContent = days[now.getDay()];
+        document.getElementById('nav-cal-num-text').textContent = now.getDate();
     }
 
-    function deleteItem(collection, id) {
-      appState[collection] = appState[collection].filter(item => item.id !== id);
-      saveState();
+    // Categorized Budget Renderer
+    function renderCategorizedBudget() {
+        renderBudgetSection('bills', 'bills-list');
+        renderBudgetSection('subscriptions', 'subscriptions-list');
+        renderBudgetSection('shopping', 'shopping-list');
+        calculateTotalCommitment();
     }
 
-    // Initial Run
-    render();
-  </script>
+    function renderBudgetSection(type, elementId) {
+        const container = document.getElementById(elementId);
+        container.innerHTML = '';
+        const items = appData[type] || [];
+
+        if (items.length === 0) {
+            container.innerHTML = `<div style="color:var(--text-accent); font-size:13px;">No items added.</div>`;
+            return;
+        }
+
+        items.forEach((item, index) => {
+            let totalItemPrice = parseFloat(item.amount) || 0;
+
+            if (item.items && item.items.length > 0) {
+                totalItemPrice = item.items.reduce((sum, sub) => sum + (parseFloat(sub.price || 0) * (parseInt(sub.qty) || 1)), 0);
+                item.amount = totalItemPrice;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'plan-item';
+            const dueText = item.dueDay ? `Due on the ${item.dueDay}${getOrdinal(item.dueDay)}` : 'Recurring';
+            const subCountText = item.items && item.items.length > 0 ? ` &middot; ${item.items.length} sub-items` : '';
+
+            div.innerHTML = `
+                <div onclick="openItemDetailModal('${type}', ${index})">
+                    <div class="plan-item-name">${item.name}</div>
+                    <div style="font-size:11px; color:var(--text-accent); margin-top:2px;">${dueText}${subCountText}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span class="plan-item-cost" onclick="openItemDetailModal('${type}', ${index})">$${totalItemPrice.toFixed(2)}</span>
+                    <button class="schedule-delete" onclick="deleteCategoryExpense('${type}', ${index})">&times;</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function calculateTotalCommitment() {
+        let total = 0;
+        ['bills', 'subscriptions', 'shopping'].forEach(cat => {
+            (appData[cat] || []).forEach(item => {
+                total += parseFloat(item.amount) || 0;
+            });
+        });
+        document.getElementById('monthly-total-amount').textContent = `$${total.toFixed(2)}`;
+    }
+
+    function openAddExpenseModal(type) {
+        document.getElementById('expense-category-type').value = type;
+        document.getElementById('expense-name-input').value = '';
+        document.getElementById('expense-amount-input').value = '';
+        document.getElementById('expense-due-input').value = '';
+        document.getElementById('expense-modal-title').textContent = `New ${type.slice(0, -1).toUpperCase()}`;
+        document.getElementById('add-expense-modal').classList.add('open');
+    }
+
+    function saveNewCategoryExpense() {
+        const type = document.getElementById('expense-category-type').value;
+        const name = document.getElementById('expense-name-input').value.trim();
+        const amount = parseFloat(document.getElementById('expense-amount-input').value) || 0;
+        const dueDay = parseInt(document.getElementById('expense-due-input').value, 10) || null;
+
+        if (name) {
+            if (!appData[type]) appData[type] = [];
+            appData[type].push({ id: Date.now(), name, amount, dueDay, items: [] });
+            saveData(appData);
+            renderCategorizedBudget();
+            closeModal('add-expense-modal');
+        }
+    }
+
+    function deleteCategoryExpense(type, index) {
+        appData[type].splice(index, 1);
+        saveData(appData);
+        renderCategorizedBudget();
+    }
+
+    // Detailed Sub-list Breakdown Modal
+    function openItemDetailModal(type, index) {
+        activeDetailObj = { type, index };
+        const item = appData[type][index];
+
+        document.getElementById('detail-item-title').textContent = item.name;
+        document.getElementById('detail-item-subtitle').textContent = item.dueDay ? `Due on the ${item.dueDay}${getOrdinal(item.dueDay)}` : 'Detailed Breakdown';
+
+        renderSubItems();
+        document.getElementById('item-details-modal').classList.add('open');
+    }
+
+    function renderSubItems() {
+        const container = document.getElementById('sub-items-container');
+        container.innerHTML = '';
+        const item = appData[activeDetailObj.type][activeDetailObj.index];
+
+        if (!item.items || item.items.length === 0) {
+            container.innerHTML = '<div style="font-size:13px; color:var(--text-accent);">No itemized list added yet.</div>';
+            return;
+        }
+
+        item.items.forEach((sub, sIdx) => {
+            const row = document.createElement('div');
+            row.className = 'sub-item-row';
+            row.innerHTML = `
+                <div>
+                    <div style="font-size:14px; font-weight:500;">${sub.name}</div>
+                    <div style="font-size:11px; color:var(--text-accent);">Qty: ${sub.qty || 1}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-weight:600; font-size:14px; color:var(--accent-color);">$${(parseFloat(sub.price || 0) * (parseInt(sub.qty) || 1)).toFixed(2)}</span>
+                    <button class="schedule-delete" onclick="deleteSubItem(${sIdx})">&times;</button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function addSubItemToDetail() {
+        const name = document.getElementById('sub-name-input').value.trim();
+        const qty = parseInt(document.getElementById('sub-qty-input').value, 10) || 1;
+        const price = parseFloat(document.getElementById('sub-price-input').value) || 0;
+
+        if (name) {
+            const item = appData[activeDetailObj.type][activeDetailObj.index];
+            if (!item.items) item.items = [];
+
+            item.items.push({ name, qty, price });
+            saveData(appData);
+
+            document.getElementById('sub-name-input').value = '';
+            document.getElementById('sub-price-input').value = '';
+            document.getElementById('sub-qty-input').value = '1';
+
+            renderSubItems();
+            renderCategorizedBudget();
+        }
+    }
+
+    function deleteSubItem(sIdx) {
+        const item = appData[activeDetailObj.type][activeDetailObj.index];
+        item.items.splice(sIdx, 1);
+        saveData(appData);
+        renderSubItems();
+        renderCategorizedBudget();
+    }
+
+    // Future Purchases
+    function renderFuturePurchases() {
+        const list = document.getElementById('purchases-list');
+        list.innerHTML = '';
+
+        if (!appData.futurePurchases || appData.futurePurchases.length === 0) {
+            list.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No purchase plans added yet.</div>';
+            return;
+        }
+
+        appData.futurePurchases.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'plan-item';
+            div.innerHTML = `
+                <div><div class="plan-item-name">${item.name}</div></div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span class="plan-item-cost">${item.cost || ''}</span>
+                    <button class="schedule-delete" onclick="deletePurchase(${index})">&times;</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function openAddPurchaseModal() {
+        document.getElementById('purchase-name-input').value = '';
+        document.getElementById('purchase-cost-input').value = '';
+        document.getElementById('purchase-modal').classList.add('open');
+    }
+
+    function saveNewPurchase() {
+        const name = document.getElementById('purchase-name-input').value.trim();
+        const cost = document.getElementById('purchase-cost-input').value.trim();
+
+        if (name) {
+            if (!appData.futurePurchases) appData.futurePurchases = [];
+            appData.futurePurchases.push({ name, cost });
+            saveData(appData);
+            renderFuturePurchases();
+            closeModal('purchase-modal');
+        }
+    }
+
+    function deletePurchase(index) {
+        appData.futurePurchases.splice(index, 1);
+        saveData(appData);
+        renderFuturePurchases();
+    }
+
+    // Calendar Engine
+    function renderCalendar() {
+        const year = calDate.getFullYear();
+        const month = calDate.getMonth();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
+
+        const grid = document.getElementById('cal-days-grid');
+        grid.innerHTML = '';
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+
+        for (let day = 1; day <= totalDays; day++) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'cal-day';
+
+            const numSpan = document.createElement('span');
+            numSpan.textContent = day;
+            dayEl.appendChild(numSpan);
+
+            const monthStr = String(month + 1).padStart(2, '0');
+            const dayStr = String(day).padStart(2, '0');
+            const dateKey = `${year}-${monthStr}-${dayStr}`;
+            const mmdd = `${monthStr}-${dayStr}`;
+
+            if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) dayEl.classList.add('today');
+            if (selectedDateKey === dateKey) dayEl.classList.add('selected');
+
+            let foundFirstName = '';
+            let hasEvents = false;
+
+            Object.keys(appData.events || {}).forEach(k => {
+                if (k === dateKey || k.endsWith(mmdd)) {
+                    hasEvents = true;
+                    appData.events[k].forEach(ev => {
+                        if (ev.type === 'yearly' && !foundFirstName) foundFirstName = ev.title.split(' ')[0];
+                    });
+                }
+            });
+
+            if (hasEvents) dayEl.classList.add('has-event');
+
+            if (foundFirstName) {
+                const nameTag = document.createElement('div');
+                nameTag.className = 'cal-day-name-tag';
+                nameTag.textContent = foundFirstName;
+                dayEl.appendChild(nameTag);
+            }
+
+            dayEl.onclick = () => selectCalendarDate(dateKey, day, monthNames[month], year);
+            grid.appendChild(dayEl);
+        }
+
+        if (!selectedDateKey) {
+            const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            selectCalendarDate(todayKey, today.getDate(), monthNames[today.getMonth()], today.getFullYear());
+        }
+    }
+
+    function selectCalendarDate(dateKey, day, monthName, year) {
+        selectedDateKey = dateKey;
+        document.getElementById('agenda-date-title').textContent = `${monthName} ${day}, ${year}`;
+        renderAgendaList();
+        renderCalendar();
+    }
+
+    function renderAgendaList() {
+        const container = document.getElementById('agenda-event-list');
+        container.innerHTML = '';
+
+        const monthDayStr = selectedDateKey.substring(5);
+        let currentDayEvents = [];
+
+        Object.keys(appData.events || {}).forEach(k => {
+            if (k === selectedDateKey || k.endsWith(monthDayStr)) {
+                appData.events[k].forEach((ev, idx) => {
+                    currentDayEvents.push({ key: k, index: idx, event: ev });
+                });
+            }
+        });
+
+        if (currentDayEvents.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No events saved for this day.</div>';
+            return;
+        }
+
+        currentDayEvents.forEach((itemObj) => {
+            const ev = itemObj.event;
+            const div = document.createElement('div');
+            div.className = 'schedule-item';
+
+            let tasksHtml = ev.tasks && ev.tasks.length > 0 ? `<div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">📋 Tasks: ${ev.tasks.join(', ')}</div>` : '';
+            let badgeText = ev.type === 'yearly' ? '🔁 Yearly' : '🗓 Event';
+
+            div.innerHTML = `
+                <div class="schedule-item-top">
+                    <span class="schedule-text">★ ${ev.title} <small style="font-size:10px; opacity:0.6; margin-left:4px;">(${badgeText})</small></span>
+                    <button class="schedule-delete" onclick="deleteCalendarEvent('${itemObj.key}', ${itemObj.index})">&times;</button>
+                </div>
+                ${tasksHtml}
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function openAddEventModal() {
+        document.getElementById('event-title-input').value = '';
+        document.getElementById('event-tasks-input').value = '';
+        document.getElementById('event-modal').classList.add('open');
+    }
+
+    function saveNewCalendarEvent() {
+        const title = document.getElementById('event-title-input').value.trim();
+        const type = document.getElementById('event-recurring-input').value;
+        const rawTasks = document.getElementById('event-tasks-input').value.trim();
+
+        if (title) {
+            if (!appData.events) appData.events = {};
+            if (!appData.events[selectedDateKey]) appData.events[selectedDateKey] = [];
+
+            const tasksList = rawTasks ? rawTasks.split(',').map(t => t.trim()).filter(t => t.length > 0) : [];
+
+            appData.events[selectedDateKey].push({ title, type, tasks: tasksList });
+            saveData(appData);
+
+            renderAgendaList();
+            renderCalendar();
+            closeModal('event-modal');
+        }
+    }
+
+    function deleteCalendarEvent(key, index) {
+        if (appData.events && appData.events[key]) {
+            appData.events[key].splice(index, 1);
+            if (appData.events[key].length === 0) delete appData.events[key];
+            saveData(appData);
+            renderAgendaList();
+            renderCalendar();
+        }
+    }
+
+    function openIosPickerModal() {
+        const monthSel = document.getElementById('picker-month-select');
+        const yearSel = document.getElementById('picker-year-select');
+
+        monthSel.value = calDate.getMonth();
+        yearSel.innerHTML = '';
+
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear - 5; y <= currentYear + 10; y++) {
+            const opt = document.createElement('option');
+            opt.value = y; opt.textContent = y;
+            if (y === calDate.getFullYear()) opt.selected = true;
+            yearSel.appendChild(opt);
+        }
+
+        document.getElementById('ios-picker-modal').classList.add('open');
+    }
+
+    function applyIosMonthYear() {
+        calDate.setFullYear(parseInt(document.getElementById('picker-year-select').value, 10));
+        calDate.setMonth(parseInt(document.getElementById('picker-month-select').value, 10));
+        renderCalendar();
+        closeModal('ios-picker-modal');
+    }
+
+    function openImportantModal() {
+        const yearlyList = document.getElementById('important-yearly-list');
+        const upcomingList = document.getElementById('important-upcoming-list');
+        yearlyList.innerHTML = ''; upcomingList.innerHTML = '';
+
+        let yearlyCount = 0, upcomingCount = 0;
+
+        Object.keys(appData.events || {}).sort().forEach(dateKey => {
+            appData.events[dateKey].forEach(ev => {
+                const item = document.createElement('div');
+                item.className = 'important-list-item';
+
+                let taskDetail = ev.tasks && ev.tasks.length > 0 ? `<div style="font-size:12px; color:var(--text-secondary);">Tasks: ${ev.tasks.join(', ')}</div>` : '';
+
+                if (ev.type === 'yearly') {
+                    yearlyCount++;
+                    item.innerHTML = `<div class="important-date">Every Year on ${dateKey.substring(5)}</div><div class="important-title">★ ${ev.title}</div>${taskDetail}`;
+                    yearlyList.appendChild(item);
+                } else {
+                    upcomingCount++;
+                    item.innerHTML = `<div class="important-date">${dateKey}</div><div class="important-title">🗓 ${ev.title}</div>${taskDetail}`;
+                    upcomingList.appendChild(item);
+                }
+            });
+        });
+
+        if (yearlyCount === 0) yearlyList.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No yearly recurring events set.</div>';
+        if (upcomingCount === 0) upcomingList.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No upcoming one-time events set.</div>';
+
+        document.getElementById('important-modal').classList.add('open');
+    }
+
+    // Schedule System
+    function renderSchedule() {
+        const container = document.getElementById('schedule-list');
+        container.innerHTML = '';
+        if (appData.schedule.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No schedule items set.</div>';
+            return;
+        }
+        appData.schedule.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'schedule-item';
+            div.style.flexDirection = 'row';
+            div.style.justifyContent = 'space-between';
+            div.innerHTML = `
+                <span class="schedule-time">${item.time}</span>
+                <span class="schedule-text" style="flex-grow:1; margin-left:12px;">${item.text}</span>
+                <button class="schedule-delete" onclick="deleteScheduleItem(${index})">&times;</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function addScheduleItem() {
+        const time = prompt('Time slot (e.g., 10:30 AM):', '10:00 AM');
+        if (!time) return;
+        const text = prompt('Event description:', 'Meeting / Work');
+        if (text) {
+            appData.schedule.push({ time, text });
+            saveData(appData);
+            renderSchedule();
+        }
+    }
+
+    function deleteScheduleItem(index) {
+        appData.schedule.splice(index, 1);
+        saveData(appData);
+        renderSchedule();
+    }
+
+    // Task System
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTasks();
+    }
+
+    function renderTasks() {
+        const taskList = document.getElementById('task-list');
+        taskList.innerHTML = '';
+
+        const filteredTasks = appData.tasks.filter(t => {
+            if (currentFilter === 'active') return !t.completed;
+            if (currentFilter === 'completed') return t.completed;
+            return true;
+        });
+
+        filteredTasks.forEach((task) => {
+            const index = appData.tasks.findIndex(t => t.id === task.id);
+            const li = document.createElement('li');
+            li.className = `task-item ${task.completed ? 'completed' : ''}`;
+            li.innerHTML = `
+                <div class="task-left">
+                    <div class="task-checkbox" onclick="toggleTask(${index})"></div>
+                    <div class="task-content">
+                        <span class="task-title">${task.title}</span>
+                        <div class="task-meta">
+                            <span>${task.category}</span> &middot; 
+                            <span class="badge badge-${task.priority}">${task.priority}</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="task-delete" onclick="deleteTask(${index})">&times;</button>
+            `;
+            taskList.appendChild(li);
+        });
+    }
+
+    function openAddTaskModal() { document.getElementById('task-modal').classList.add('open'); }
+
+    function saveNewTask() {
+        const title = document.getElementById('task-title-input').value.trim();
+        const category = document.getElementById('task-cat-input').value;
+        const priority = document.getElementById('task-prio-input').value;
+
+        if (title) {
+            appData.tasks.unshift({ id: Date.now(), title, category, priority, completed: false });
+            saveData(appData);
+            renderTasks();
+            document.getElementById('task-title-input').value = '';
+            closeModal('task-modal');
+        }
+    }
+
+    function toggleTask(index) {
+        appData.tasks[index].completed = !appData.tasks[index].completed;
+        saveData(appData);
+        renderTasks();
+    }
+
+    function deleteTask(index) {
+        appData.tasks.splice(index, 1);
+        saveData(appData);
+        renderTasks();
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function openSettingsModal() {
+        document.getElementById('setting-name-input').value = appData.userName || 'Slim';
+        document.getElementById('setting-streak-input').value = appData.streak || 0;
+        document.getElementById('settings-modal').classList.add('open');
+    }
+
+    function saveSettings() {
+        const name = document.getElementById('setting-name-input').value.trim();
+        const streak = parseInt(document.getElementById('setting-streak-input').value, 10);
+
+        if (name) appData.userName = name;
+        if (!isNaN(streak)) appData.streak = streak;
+
+        saveData(appData);
+        updateHeader();
+        closeModal('settings-modal');
+    }
+
+    function getOrdinal(n) {
+        const s = ["th", "st", "nd", "rd"];
+        const v = n % 100;
+        return s[(v - 20) % 10] || s[v] || s[0];
+    }
+
+    // Verse Handler
+    const verseInput = document.getElementById('verse-input');
+    verseInput.value = appData.verse || '';
+    verseInput.addEventListener('input', () => {
+        appData.verse = verseInput.value;
+        saveData(appData);
+    });
+
+    // Init App
+    updateHeader();
+    renderCalendar();
+    renderSchedule();
+    renderTasks();
+    renderFuturePurchases();
+    renderCategorizedBudget();
+</script>
+
 </body>
 </html>
