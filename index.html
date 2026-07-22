@@ -3,124 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Dashboard - Notes & Budget</title>
+  <title>Personal Dashboard</title>
   <style>
     :root {
-      --bg-dark: #121214;
+      --bg-color: #121214;
       --card-bg: #1e1e22;
-      --accent: #ffffff;
+      --text-color: #ffffff;
       --text-muted: #a1a1aa;
-      --border: #27272a;
+      --border-color: #27272a;
+      --accent-color: #ffffff;
+      --input-bg: #141416;
       --green: #4ade80;
     }
 
-    body {
-      background-color: var(--bg-dark);
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    [data-theme="light"] {
+      --bg-color: #f4f4f5;
+      --card-bg: #ffffff;
+      --text-color: #18181b;
+      --text-muted: #71717a;
+      --border-color: #e4e4e7;
+      --accent-color: #18181b;
+      --input-bg: #f4f4f5;
+      --green: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 24px;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-      gap: 24px;
-      max-width: 1400px;
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* --- Navigation Bar --- */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 32px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-btn.active, .nav-btn:hover {
+      color: var(--text-color);
+      background: var(--input-bg);
+    }
+
+    .theme-toggle {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* --- 3D Icon Styles --- */
+    .icon-3d-notes {
+      width: 24px;
+      height: 24px;
+      background: #2a2a2e;
+      border-radius: 6px;
+      border-top: 5px solid #f2f2f7;
+      box-shadow: 0 4px 0 #000, 0 6px 10px rgba(0,0,0,0.4);
+      transform: perspective(300px) rotateX(10deg);
+      display: inline-block;
+    }
+
+    .icon-3d-budget {
+      width: 26px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transform: perspective(300px) rotateY(-10deg) rotateX(5deg);
+      display: inline-block;
+    }
+
+    /* --- Layout Container --- */
+    main {
+      padding: 32px;
+      max-width: 1200px;
       margin: 0 auto;
+      width: 100%;
+      flex: 1;
     }
 
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page-title {
+      font-size: 28px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* --- Common UI Components --- */
     .card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 24px;
-    }
-
-    /* --- 3D Icons --- */
-    .icon-3d-note {
-      width: 48px;
-      height: 48px;
-      background: #2a2a2e;
-      border-radius: 12px;
-      box-shadow: 0 6px 0 #000, 0 12px 18px rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #3f3f46;
-      font-size: 20px;
-      transform: perspective(500px) rotateX(10deg);
-    }
-
-    .icon-3d-folder {
-      width: 48px;
-      height: 44px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      transform: perspective(500px) rotateY(-8deg) rotateX(4deg);
-    }
-
-    .header-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       margin-bottom: 24px;
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    /* --- UI Components --- */
-    .btn {
-      background: #27272a;
-      color: #fff;
-      border: 1px solid #3f3f46;
-      padding: 8px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    .btn:hover { background: #3f3f46; }
-
-    .section-split {
+    .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 24px;
     }
 
-    .list-item {
-      background: #141416;
+    .btn {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .item-row {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
       padding: 12px 16px;
       border-radius: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid var(--border);
-    }
-
-    .badge {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: #27272a;
-      color: var(--text-muted);
     }
 
     .progress-bar {
       height: 6px;
-      background: #27272a;
+      background: var(--border-color);
       border-radius: 3px;
       overflow: hidden;
       margin-top: 8px;
@@ -128,221 +196,285 @@
 
     .progress-fill {
       height: 100%;
-      background: #fff;
-      transition: width 0.3s ease;
+      background: var(--accent-color);
     }
 
-    .delete-btn {
-      background: none;
-      border: none;
-      color: #ef4444;
-      cursor: pointer;
-      font-size: 14px;
-      margin-left: 8px;
+    .badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--border-color);
+      color: var(--text-muted);
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      nav { flex-direction: column; gap: 16px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="dashboard-grid">
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="switchPage('notes-page', this)">
+        <span class="icon-3d-notes"></span> Notes & Goals
+      </button>
+      <button class="nav-btn" onclick="switchPage('budget-page', this)">
+        <span class="icon-3d-budget"></span> Budget Planner
+      </button>
+      <button class="nav-btn" onclick="switchPage('calendar-page', this)">📅 Calendar</button>
+      <button class="nav-btn" onclick="switchPage('tasks-page', this)">✅ Tasks</button>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </nav>
 
-    <!-- ================= NOTES & GOALS SECTION ================= -->
-    <section class="card">
-      <div class="header-title">
-        <div class="header-left">
-          <div class="icon-3d-note">📝</div>
-          <h2>Notes & Goals</h2>
-        </div>
-        <button class="btn" onclick="addNote()">+ Note</button>
-      </div>
-
-      <div class="section-split">
-        <!-- Notes Column -->
-        <div>
-          <h3>Notes</h3>
-          <div id="notes-container"></div>
-        </div>
-
-        <!-- Goals Column -->
-        <div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Goals</h3>
-            <button class="btn" style="padding:4px 8px; font-size:12px;" onclick="addGoal()">+ Goal</button>
+  <main>
+    <!-- ================= NOTES & GOALS PAGE ================= -->
+    <div id="notes-page" class="page active">
+      <h1 class="page-title"><span class="icon-3d-notes"></span> Notes & Goals</h1>
+      
+      <div class="grid-2">
+        <!-- Notes Section -->
+        <div class="card">
+          <div class="flex-between">
+            <h2>Notes</h2>
+            <button class="btn btn-sm" onclick="addNote()">+ Add Note</button>
           </div>
-          <div id="goals-container"></div>
+          <div id="notes-list"></div>
+        </div>
+
+        <!-- Goals Section -->
+        <div class="card">
+          <div class="flex-between">
+            <h2>Goals</h2>
+            <button class="btn btn-sm" onclick="addGoal()">+ Add Goal</button>
+          </div>
+          <div id="goals-list"></div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ================= BUDGET PLANNER SECTION ================= -->
-    <section class="card">
-      <div class="header-title">
-        <div class="header-left">
-          <div class="icon-3d-folder">📁</div>
-          <h2>Budget Planner</h2>
+    <!-- ================= BUDGET PLANNER PAGE ================= -->
+    <div id="budget-page" class="page">
+      <h1 class="page-title"><span class="icon-3d-budget"></span> Budget Planner</h1>
+
+      <!-- Project Budgets -->
+      <div class="card">
+        <div class="flex-between">
+          <div>
+            <h2>Project Budgets</h2>
+            <p style="color: var(--text-muted); font-size: 13px;">Draft budgets for upcoming projects and track spending.</p>
+          </div>
+          <button class="btn btn-sm" onclick="addProjectBudget()">+ Draft Project Budget</button>
         </div>
-        <button class="btn" onclick="addProject()">+ Project Budget</button>
+        <div id="projects-list"></div>
       </div>
 
-      <!-- Active Projects -->
-      <h3>Project Budgets</h3>
-      <div id="projects-container"></div>
+      <!-- Recurring Spendings -->
+      <div class="card">
+        <div class="flex-between">
+          <h2>Monthly Recurring Spendings</h2>
+          <button class="btn btn-sm" onclick="addRecurringExpense()">+ Add Monthly Expense</button>
+        </div>
+        
+        <div id="recurring-list"></div>
 
-      <hr style="border-color: var(--border); margin: 24px 0;">
-
-      <!-- Recurring Expenses -->
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3>Recurring Monthly Spendings</h3>
-        <button class="btn" style="padding:4px 8px; font-size:12px;" onclick="addExpense()">+ Expense</button>
+        <div style="margin-top: 20px; padding: 16px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color);" class="flex-between">
+          <strong>Total Monthly Overhead:</strong>
+          <strong id="recurring-total" style="color: var(--green); font-size: 18px;">$0.00</strong>
+        </div>
       </div>
-      <div id="expenses-container"></div>
+    </div>
 
-      <!-- Overall Summary -->
-      <div style="margin-top: 20px; padding: 16px; background: #141416; border: 1px solid var(--border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-        <span><strong>Total Recurring Overhead:</strong></span>
-        <strong id="recurring-total" style="color: var(--green); font-size: 18px;">$0.00</strong>
+    <!-- ================= CALENDAR PAGE ================= -->
+    <div id="calendar-page" class="page">
+      <h1 class="page-title">📅 Calendar</h1>
+      <div class="card">
+        <p style="color: var(--text-muted);">Calendar view active.</p>
       </div>
-    </section>
+    </div>
 
-  </div>
+    <!-- ================= TASKS PAGE ================= -->
+    <div id="tasks-page" class="page">
+      <h1 class="page-title">✅ Tasks</h1>
+      <div class="card">
+        <p style="color: var(--text-muted);">Task management view active.</p>
+      </div>
+    </div>
+  </main>
 
   <script>
-    // Initial State Structure
-    let state = JSON.parse(localStorage.getItem('dashboard_data')) || {
-      notes: [
-        { id: 1, title: 'App Ideas', desc: 'Build local storage budget feature.' }
-      ],
-      goals: [
-        { id: 1, title: 'Launch Website', progress: 70 }
-      ],
-      projects: [
-        { id: 1, name: 'Setup Server', spent: 150, total: 300 }
-      ],
-      expenses: [
-        { id: 1, name: 'Netflix Subscription', category: 'Subscriptions', cost: 15 },
-        { id: 2, name: 'Groceries', category: 'Shopping', cost: 350 }
+    // --- State Management ---
+    let appState = JSON.parse(localStorage.getItem('dashboard_state')) || {
+      theme: 'dark',
+      notes: [{ id: 1, title: 'Dashboard Setup', content: 'Configure notes and budget planner pages.' }],
+      goals: [{ id: 1, title: 'Launch Website', progress: 80 }],
+      projects: [{ id: 1, name: 'Setup Home Office', budget: 1000, spent: 450 }],
+      recurring: [
+        { id: 1, name: 'Electric Bill', category: 'Bills', cost: 120 },
+        { id: 2, name: 'Cloud Hosting', category: 'Subscriptions', cost: 20 },
+        { id: 3, name: 'Groceries', category: 'Shopping', cost: 400 }
       ]
     };
 
     function saveState() {
-      localStorage.setItem('dashboard_data', JSON.stringify(state));
+      localStorage.setItem('dashboard_state', JSON.stringify(appState));
       render();
     }
 
-    // Render Functions
+    // --- Navigation ---
+    function switchPage(pageId, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // --- Theme Toggle ---
+    function toggleTheme() {
+      appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', appState.theme);
+      saveState();
+    }
+
+    // Initialize Theme
+    document.documentElement.setAttribute('data-theme', appState.theme || 'dark');
+
+    // --- Dynamic Render Functions ---
     function render() {
-      // 1. Render Notes
-      const notesContainer = document.getElementById('notes-container');
-      notesContainer.innerHTML = state.notes.map(n => `
-        <div class="list-item" style="display:block;">
-          <div style="display:flex; justify-content:space-between;">
+      // Render Notes
+      const notesList = document.getElementById('notes-list');
+      notesList.innerHTML = appState.notes.map(n => `
+        <div class="item-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+          <div style="display:flex; justify-content:space-between; width:100%;">
             <strong>${n.title}</strong>
-            <button class="delete-btn" onclick="deleteItem('notes', ${n.id})">✕</button>
+            <button class="btn-danger" onclick="deleteItem('notes', ${n.id})">✕</button>
           </div>
-          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${n.desc}</div>
+          <div style="font-size: 13px; color: var(--text-muted);">${n.content}</div>
         </div>
       `).join('');
 
-      // 2. Render Goals
-      const goalsContainer = document.getElementById('goals-container');
-      goalsContainer.innerHTML = state.goals.map(g => `
-        <div class="list-item" style="display:block;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
+      // Render Goals
+      const goalsList = document.getElementById('goals-list');
+      goalsList.innerHTML = appState.goals.map(g => `
+        <div class="item-row" style="display:block;">
+          <div class="flex-between">
             <span>${g.title}</span>
             <div>
               <span class="badge">${g.progress}%</span>
-              <button class="delete-btn" onclick="deleteItem('goals', ${g.id})">✕</button>
+              <button class="btn-danger" onclick="deleteItem('goals', ${g.id})">✕</button>
             </div>
           </div>
           <div class="progress-bar"><div class="progress-fill" style="width: ${g.progress}%;"></div></div>
         </div>
       `).join('');
 
-      // 3. Render Project Budgets
-      const projectsContainer = document.getElementById('projects-container');
-      projectsContainer.innerHTML = state.projects.map(p => {
-        const percent = Math.min(Math.round((p.spent / p.total) * 100), 100);
+      // Render Project Budgets
+      const projectsList = document.getElementById('projects-list');
+      projectsList.innerHTML = appState.projects.map(p => {
+        const pct = Math.min(Math.round((p.spent / p.budget) * 100), 100);
         return `
-          <div class="list-item" style="display:block;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="item-row" style="display:block;">
+            <div class="flex-between">
               <strong>${p.name}</strong>
               <div>
-                <span style="font-size:13px; color:var(--text-muted);">$${p.spent} / $${p.total}</span>
-                <button class="delete-btn" onclick="deleteItem('projects', ${p.id})">✕</button>
+                <span style="font-size: 13px; color: var(--text-muted);">$${p.spent} / $${p.budget} Spent</span>
+                <button class="btn-danger" onclick="addProjectExpense(${p.id})">+$</button>
+                <button class="btn-danger" onclick="deleteItem('projects', ${p.id})">✕</button>
               </div>
             </div>
-            <div class="progress-bar"><div class="progress-fill" style="width: ${percent}%;"></div></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%;"></div></div>
           </div>
         `;
       }).join('');
 
-      // 4. Render Recurring Expenses & Total
-      const expensesContainer = document.getElementById('expenses-container');
-      let totalExpense = 0;
-      expensesContainer.innerHTML = state.expenses.map(e => {
-        totalExpense += Number(e.cost);
+      // Render Recurring Spendings
+      const recurringList = document.getElementById('recurring-list');
+      let totalCost = 0;
+      recurringList.innerHTML = appState.recurring.map(r => {
+        totalCost += Number(r.cost);
         return `
-          <div class="list-item">
+          <div class="item-row">
             <div>
-              <span>${e.name}</span>
-              <span class="badge" style="margin-left:8px;">${e.category}</span>
+              <span>${r.name}</span>
+              <span class="badge" style="margin-left: 8px;">${r.category}</span>
             </div>
             <div>
-              <strong>$${e.cost}/mo</strong>
-              <button class="delete-btn" onclick="deleteItem('expenses', ${e.id})">✕</button>
+              <strong>$${r.cost}/mo</strong>
+              <button class="btn-danger" onclick="deleteItem('recurring', ${r.id})">✕</button>
             </div>
           </div>
         `;
       }).join('');
 
-      document.getElementById('recurring-total').innerText = `$${totalExpense.toFixed(2)}`;
+      document.getElementById('recurring-total').innerText = `$${totalCost.toFixed(2)}`;
     }
 
-    // Action Methods
+    // --- Action Handlers ---
     function addNote() {
       const title = prompt('Note Title:');
-      const desc = prompt('Note Details:');
+      const content = prompt('Note Content:');
       if (title) {
-        state.notes.push({ id: Date.now(), title, desc: desc || '' });
+        appState.notes.push({ id: Date.now(), title, content: content || '' });
         saveState();
       }
     }
 
     function addGoal() {
       const title = prompt('Goal Title:');
-      const progress = prompt('Progress percentage (0-100):', '0');
+      const progress = prompt('Initial Progress (0-100%):', '0');
       if (title) {
-        state.goals.push({ id: Date.now(), title, progress: Number(progress) || 0 });
+        appState.goals.push({ id: Date.now(), title, progress: Number(progress) || 0 });
         saveState();
       }
     }
 
-    function addProject() {
+    function addProjectBudget() {
       const name = prompt('Project Name:');
-      const total = prompt('Total Estimated Budget ($):');
-      const spent = prompt('Initial Spent Amount ($):', '0');
-      if (name && total) {
-        state.projects.push({ id: Date.now(), name, total: Number(total), spent: Number(spent) });
+      const budget = prompt('Draft Budget Amount ($):');
+      if (name && budget) {
+        appState.projects.push({ id: Date.now(), name, budget: Number(budget), spent: 0 });
         saveState();
       }
     }
 
-    function addExpense() {
-      const name = prompt('Expense Name (e.g. Electric Bill, Grocery):');
+    function addProjectExpense(id) {
+      const amount = prompt('Add spending amount to project ($):');
+      if (amount) {
+        const project = appState.projects.find(p => p.id === id);
+        if (project) {
+          project.spent += Number(amount);
+          saveState();
+        }
+      }
+    }
+
+    function addRecurringExpense() {
+      const name = prompt('Expense Name:');
       const category = prompt('Category (Bills, Subscriptions, Shopping):', 'Bills');
-      const cost = prompt('Monthly Cost ($):');
+      const cost = prompt('Monthly Amount ($):');
       if (name && cost) {
-        state.expenses.push({ id: Date.now(), name, category: category || 'General', cost: Number(cost) });
+        appState.recurring.push({ id: Date.now(), name, category: category || 'Bills', cost: Number(cost) });
         saveState();
       }
     }
 
-    function deleteItem(type, id) {
-      state[type] = state[type].filter(item => item.id !== id);
+    function deleteItem(collection, id) {
+      appState[collection] = appState[collection].filter(item => item.id !== id);
       saveState();
     }
 
-    // Initialize App
+    // Initial Run
     render();
   </script>
 </body>
