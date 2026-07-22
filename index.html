@@ -1,1394 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Dashboard - Slim</title>
-    <style>
-        :root {
-            --bg-color: #0b0b0d;
-            --widget-bg: #161619;
-            --task-bg: #222226;
-            --modal-bg: #1c1c20;
-            --text-primary: #ffffff;
-            --text-secondary: #999999;
-            --text-accent: #666666;
-            --border-color: #333333;
-            --border-radius: 24px;
-            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            --accent-color: #ff5e3a;
-            --star-red: #ff3b30;
-        }
-
-        body.light-theme {
-            --bg-color: #ffffff;
-            --widget-bg: #f4f4f6;
-            --task-bg: #e5e5ea;
-            --modal-bg: #ffffff;
-            --text-primary: #000000;
-            --text-secondary: #444444;
-            --text-accent: #777777;
-            --border-color: #d1d1d6;
-            --accent-color: #000000;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: var(--font-family);
-            margin: 0;
-            padding: 24px 16px 100px 16px;
-            display: flex;
-            justify-content: center;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* Page View Switcher */
-        .page-view {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            width: 100%;
-        }
-
-        .page-view.active {
-            display: flex;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            padding: 0 4px;
-        }
-
-        #greeting-time {
-            font-size: 20px;
-            font-weight: 300;
-            color: var(--text-secondary);
-        }
-
-        h1.page-title {
-            font-size: 42px;
-            font-weight: 400;
-            margin: 2px 0 0;
-            letter-spacing: -0.5px;
-        }
-
-        .header-icon-btn {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-        }
-
-        .star-btn { margin-top: 14px; }
-
-        .gear-icon svg, .star-btn svg {
-            filter: drop-shadow(0px 4px 10px rgba(255, 59, 48, 0.3));
-            transition: transform 0.2s ease;
-        }
-
-        .header-icon-btn:active svg { transform: scale(0.9) rotate(15deg); }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .widget {
-            background-color: var(--widget-bg);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            transition: background-color 0.3s ease;
-        }
-
-        .widget-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-accent);
-            font-weight: 500;
-            margin-bottom: 12px;
-        }
-
-        #today-mon { font-size: 22px; font-weight: 300; color: var(--text-secondary); }
-
-        #today-date {
-            font-size: 64px;
-            font-weight: 300;
-            line-height: 1;
-            margin: 4px 0 16px;
-        }
-
-        .streak-info {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .text-input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 17px;
-            font-weight: 300;
-            resize: none;
-            padding: 0;
-            margin-top: 4px;
-            line-height: 1.4;
-            font-family: inherit;
-        }
-
-        .text-input:focus { outline: none; color: var(--text-primary); }
-
-        #verse-input { height: 90px; }
-
-        /* Calendar Styling */
-        .calendar-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .calendar-month-btn {
-            font-size: 20px;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.06);
-            padding: 6px 16px;
-            border-radius: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        body.light-theme .calendar-month-btn {
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .cal-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            text-align: center;
-        }
-
-        .cal-day-name {
-            font-size: 12px;
-            color: var(--text-accent);
-            font-weight: 600;
-            padding-bottom: 6px;
-        }
-
-        .cal-day {
-            min-height: 52px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding-top: 6px;
-            border-radius: 14px;
-            font-size: 14px;
-            cursor: pointer;
-            position: relative;
-            color: var(--text-primary);
-            background-color: var(--task-bg);
-            transition: transform 0.15s ease, background-color 0.2s ease;
-            overflow: hidden;
-        }
-
-        .cal-day.today { border: 2px solid var(--accent-color); font-weight: bold; }
-
-        .cal-day.selected {
-            background-color: var(--accent-color) !important;
-            color: #ffffff !important;
-        }
-
-        body.light-theme .cal-day.selected {
-            color: #ffffff !important;
-        }
-
-        .cal-day-name-tag {
-            font-size: 9px;
-            color: var(--star-red);
-            font-weight: 700;
-            margin-top: 2px;
-            width: 100%;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 0 2px;
-        }
-
-        .cal-day.selected .cal-day-name-tag { color: #ffffff; }
-
-        .cal-day.has-event::after {
-            content: ''; width: 4px; height: 4px;
-            background-color: var(--star-red);
-            border-radius: 50%; position: absolute; bottom: 3px;
-        }
-
-        /* Schedule & Lists */
-        .schedule-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .btn-small {
-            background-color: var(--task-bg);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .schedule-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .schedule-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background-color: var(--task-bg);
-            padding: 12px 14px;
-            border-radius: 16px;
-            font-size: 14px;
-        }
-
-        .schedule-item-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .schedule-time { color: var(--accent-color); font-size: 12px; font-weight: 600; }
-        .schedule-text { font-weight: 500; color: var(--text-primary); }
-        .schedule-delete { background: none; border: none; color: var(--text-accent); cursor: pointer; font-size: 18px; line-height: 1; }
-
-        /* Tasks Styling */
-        .tasks-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .task-filters { display: flex; gap: 8px; margin-bottom: 12px; }
-        .filter-btn {
-            background: none; border: none; color: var(--text-accent);
-            font-size: 12px; cursor: pointer; padding: 2px 8px; border-radius: 8px;
-        }
-        .filter-btn.active { background-color: var(--task-bg); color: var(--text-primary); }
-
-        #task-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-
-        .task-item {
-            background-color: var(--task-bg);
-            border-radius: 16px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .task-left { display: flex; align-items: center; gap: 12px; }
-        .task-checkbox {
-            width: 22px; height: 22px; border: 2px solid var(--text-accent);
-            border-radius: 50%; background-color: transparent; cursor: pointer;
-        }
-
-        .task-content { display: flex; flex-direction: column; }
-        .task-title { font-size: 15px; color: var(--text-primary); }
-        .task-meta { font-size: 11px; color: var(--text-accent); margin-top: 2px; display: flex; gap: 6px; align-items: center; }
-
-        .badge { padding: 1px 6px; border-radius: 6px; font-size: 10px; text-transform: uppercase; }
-        .badge-high { background-color: rgba(255, 94, 58, 0.2); color: #ff5e3a; }
-        .badge-medium { background-color: rgba(255, 184, 0, 0.2); color: #ffb800; }
-        .badge-low { background-color: rgba(0, 200, 81, 0.2); color: #00c851; }
-
-        .task-delete { background: none; border: none; color: var(--text-accent); font-size: 18px; padding: 0 4px; cursor: pointer; }
-        .task-item.completed .task-title { text-decoration: line-through; color: var(--text-accent); }
-        .task-item.completed .task-checkbox { border-color: var(--text-accent); background-color: var(--text-accent); }
-
-        /* Future Plans / Purchases */
-        .plan-item {
-            background-color: var(--task-bg);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.15s ease;
-        }
-
-        .plan-item:active { transform: scale(0.98); }
-        .plan-item-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
-        .plan-item-cost { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-
-        .budget-total-box {
-            background: var(--widget-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        /* Item Side-by-side Entry Table */
-        .side-entry-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: var(--task-bg);
-            padding: 12px 14px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-        }
-
-        /* Bottom Navigation Bar */
-        .bottom-nav-container {
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 32px);
-            max-width: 440px;
-            background-color: rgba(22, 22, 25, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 28px;
-            padding: 8px 20px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            z-index: 90;
-        }
-
-        body.light-theme .bottom-nav-container {
-            background-color: rgba(240, 240, 245, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-
-        .nav-btn {
-            background: none; border: none; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px;
-            transition: transform 0.2s ease;
-        }
-
-        .nav-btn:active { transform: scale(0.9); }
-
-        .icon-3d-home {
-            width: 44px; height: 44px;
-            background: linear-gradient(145deg, #232328, #101013);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5); color: #ffffff;
-        }
-
-        body.light-theme .icon-3d-home {
-            background: linear-gradient(145deg, #ffffff, #e0e0e0);
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            color: #000000;
-        }
-
-        .icon-3d-cal {
-            width: 44px; height: 44px;
-            background: #ffffff; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center;
-            overflow: hidden; position: relative;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .icon-3d-cal-top {
-            width: 100%; height: 18px;
-            background: linear-gradient(135deg, #ff7a00, #ff004c);
-            display: flex; justify-content: space-around; align-items: center; padding: 0 6px;
-        }
-
-        body.light-theme .icon-3d-cal-top {
-            background: linear-gradient(135deg, #333333, #000000);
-        }
-
-        .icon-3d-cal-binder { width: 4px; height: 6px; background: #ffffff; border-radius: 2px; }
-        .icon-3d-cal-body { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .icon-3d-cal-day { font-size: 7px; color: #ff004c; font-weight: 700; text-transform: uppercase; line-height: 1; }
-        body.light-theme .icon-3d-cal-day { color: #000000; }
-        .icon-3d-cal-num { font-size: 14px; color: #000000; font-weight: 800; line-height: 1; }
-
-        .icon-3d-plans {
-            width: 44px; height: 44px;
-            border-radius: 13px; background: #f7e2a9;
-            position: relative; overflow: hidden;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex; flex-direction: column; justify-content: flex-end;
-        }
-
-        .icon-3d-plans-layer-mid {
-            width: 100%; height: 28px; background: #a27df0;
-            border-top-left-radius: 40% 12px; border-top-right-radius: 40% 12px;
-            position: absolute; bottom: 0;
-        }
-
-        body.light-theme .icon-3d-plans-layer-mid { background: #888888; }
-
-        .icon-3d-plans-layer-bot {
-            width: 100%; height: 18px; background: #000000;
-            border-top-left-radius: 50% 10px; border-top-right-radius: 50% 10px;
-            position: absolute; bottom: 0;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .icon-3d-plans-check {
-            width: 10px; height: 6px;
-            border-left: 2px solid #ffffff; border-bottom: 2px solid #ffffff;
-            transform: rotate(-45deg) translate(1px, -1px);
-        }
-
-        .nav-btn.active .icon-3d-home,
-        .nav-btn.active .icon-3d-cal,
-        .nav-btn.active .icon-3d-plans { outline: 2px solid var(--accent-color); outline-offset: 2px; }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex; justify-content: center; align-items: flex-end;
-            opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 100;
-        }
-
-        .modal-overlay.open { opacity: 1; pointer-events: auto; }
-
-        .modal {
-            background-color: var(--modal-bg);
-            width: 100%; max-width: 480px;
-            border-top-left-radius: 28px; border-top-right-radius: 28px;
-            padding: 24px; display: flex; flex-direction: column; gap: 16px;
-            transform: translateY(100%); transition: transform 0.25s ease;
-            max-height: 85vh; overflow-y: auto;
-        }
-
-        .modal-overlay.open .modal { transform: translateY(0); }
-        .modal-title { font-size: 20px; font-weight: 600; margin: 0 0 4px 0; }
-
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 12px; color: var(--text-accent); text-transform: uppercase; font-weight: 600; }
-
-        .form-input, .form-select, .form-textarea {
-            background-color: var(--task-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 12px;
-            color: var(--text-primary); font-size: 15px; outline: none; font-family: inherit;
-        }
-
-        .modal-buttons { display: flex; gap: 10px; margin-top: 8px; }
-
-        .btn-primary {
-            flex: 1; background-color: var(--text-primary); color: var(--bg-color);
-            border: none; border-radius: 14px; padding: 12px; font-weight: 600; cursor: pointer;
-        }
-
-        .btn-secondary {
-            flex: 1; background-color: var(--task-bg); color: var(--text-primary);
-            border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; cursor: pointer;
-        }
-
-        .ios-picker-row { display: flex; gap: 10px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Dashboard - Notes & Budget</title>
+  <style>
+    :root {
+      --bg-dark: #121214;
+      --card-bg: #1e1e22;
+      --accent: #ffffff;
+      --text-muted: #a1a1aa;
+      --border: #27272a;
+      --green: #4ade80;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    /* --- 3D Icons --- */
+    .icon-3d-note {
+      width: 48px;
+      height: 48px;
+      background: #2a2a2e;
+      border-radius: 12px;
+      box-shadow: 0 6px 0 #000, 0 12px 18px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #3f3f46;
+      font-size: 20px;
+      transform: perspective(500px) rotateX(10deg);
+    }
+
+    .icon-3d-folder {
+      width: 48px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transform: perspective(500px) rotateY(-8deg) rotateX(4deg);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* --- UI Components --- */
+    .btn {
+      background: #27272a;
+      color: #fff;
+      border: 1px solid #3f3f46;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #3f3f46; }
+
+    .section-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .list-item {
+      background: #141416;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border);
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #27272a;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: #27272a;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 8px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
+  <div class="dashboard-grid">
 
-    <!-- PAGE 1: HOME DASHBOARD -->
-    <div class="page-view active" id="page-home">
-        <header>
+    <!-- ================= NOTES & GOALS SECTION ================= -->
+    <section class="card">
+      <div class="header-title">
+        <div class="header-left">
+          <div class="icon-3d-note">📝</div>
+          <h2>Notes & Goals</h2>
+        </div>
+        <button class="btn" onclick="addNote()">+ Note</button>
+      </div>
+
+      <div class="section-split">
+        <!-- Notes Column -->
+        <div>
+          <h3>Notes</h3>
+          <div id="notes-container"></div>
+        </div>
+
+        <!-- Goals Column -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Goals</h3>
+            <button class="btn" style="padding:4px 8px; font-size:12px;" onclick="addGoal()">+ Goal</button>
+          </div>
+          <div id="goals-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BUDGET PLANNER SECTION ================= -->
+    <section class="card">
+      <div class="header-title">
+        <div class="header-left">
+          <div class="icon-3d-folder">📁</div>
+          <h2>Budget Planner</h2>
+        </div>
+        <button class="btn" onclick="addProject()">+ Project Budget</button>
+      </div>
+
+      <!-- Active Projects -->
+      <h3>Project Budgets</h3>
+      <div id="projects-container"></div>
+
+      <hr style="border-color: var(--border); margin: 24px 0;">
+
+      <!-- Recurring Expenses -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>Recurring Monthly Spendings</h3>
+        <button class="btn" style="padding:4px 8px; font-size:12px;" onclick="addExpense()">+ Expense</button>
+      </div>
+      <div id="expenses-container"></div>
+
+      <!-- Overall Summary -->
+      <div style="margin-top: 20px; padding: 16px; background: #141416; border: 1px solid var(--border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+        <span><strong>Total Recurring Overhead:</strong></span>
+        <strong id="recurring-total" style="color: var(--green); font-size: 18px;">$0.00</strong>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Initial State Structure
+    let state = JSON.parse(localStorage.getItem('dashboard_data')) || {
+      notes: [
+        { id: 1, title: 'App Ideas', desc: 'Build local storage budget feature.' }
+      ],
+      goals: [
+        { id: 1, title: 'Launch Website', progress: 70 }
+      ],
+      projects: [
+        { id: 1, name: 'Setup Server', spent: 150, total: 300 }
+      ],
+      expenses: [
+        { id: 1, name: 'Netflix Subscription', category: 'Subscriptions', cost: 15 },
+        { id: 2, name: 'Groceries', category: 'Shopping', cost: 350 }
+      ]
+    };
+
+    function saveState() {
+      localStorage.setItem('dashboard_data', JSON.stringify(state));
+      render();
+    }
+
+    // Render Functions
+    function render() {
+      // 1. Render Notes
+      const notesContainer = document.getElementById('notes-container');
+      notesContainer.innerHTML = state.notes.map(n => `
+        <div class="list-item" style="display:block;">
+          <div style="display:flex; justify-content:space-between;">
+            <strong>${n.title}</strong>
+            <button class="delete-btn" onclick="deleteItem('notes', ${n.id})">✕</button>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${n.desc}</div>
+        </div>
+      `).join('');
+
+      // 2. Render Goals
+      const goalsContainer = document.getElementById('goals-container');
+      goalsContainer.innerHTML = state.goals.map(g => `
+        <div class="list-item" style="display:block;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>${g.title}</span>
             <div>
-                <div id="greeting-time">Good evening</div>
-                <h1 class="page-title" id="user-name">Slim</h1>
+              <span class="badge">${g.progress}%</span>
+              <button class="delete-btn" onclick="deleteItem('goals', ${g.id})">✕</button>
             </div>
-            <button class="header-icon-btn gear-icon" onclick="openSettingsModal()">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23-0.41-0.12-0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
-                </svg>
-            </button>
-        </header>
-
-        <div class="grid-2">
-            <div class="widget">
-                <div class="widget-label">Today</div>
-                <div id="today-mon">Mon</div>
-                <div id="today-date">20</div>
-                <div class="streak-info">🔥 <span id="streak-count">0</span> day streak</div>
-            </div>
-
-            <div class="widget">
-                <div class="widget-label">The Week's Verse</div>
-                <textarea id="verse-input" class="text-input" placeholder="Enter verse..."></textarea>
-            </div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: ${g.progress}%;"></div></div>
         </div>
+      `).join('');
 
-        <div class="widget">
-            <div class="schedule-header">
-                <div class="widget-label" style="margin:0;">Today's Schedule</div>
-                <button class="btn-small" onclick="addScheduleItem()">+ time</button>
+      // 3. Render Project Budgets
+      const projectsContainer = document.getElementById('projects-container');
+      projectsContainer.innerHTML = state.projects.map(p => {
+        const percent = Math.min(Math.round((p.spent / p.total) * 100), 100);
+        return `
+          <div class="list-item" style="display:block;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>${p.name}</strong>
+              <div>
+                <span style="font-size:13px; color:var(--text-muted);">$${p.spent} / $${p.total}</span>
+                <button class="delete-btn" onclick="deleteItem('projects', ${p.id})">✕</button>
+              </div>
             </div>
-            <div class="schedule-list" id="schedule-list"></div>
-        </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: ${percent}%;"></div></div>
+          </div>
+        `;
+      }).join('');
 
-        <div class="widget">
-            <div class="tasks-header">
-                <div class="widget-label" style="margin:0;">Today's Tasks</div>
-                <button class="btn-small" onclick="openAddTaskModal()">+ add</button>
-            </div>
-            <div class="task-filters">
-                <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-                <button class="filter-btn" onclick="setFilter('active', this)">Active</button>
-                <button class="filter-btn" onclick="setFilter('completed', this)">Done</button>
-            </div>
-            <ul id="task-list"></ul>
-        </div>
-    </div>
-
-    <!-- PAGE 2: FULL CALENDAR PAGE -->
-    <div class="page-view" id="page-calendar">
-        <header>
+      // 4. Render Recurring Expenses & Total
+      const expensesContainer = document.getElementById('expenses-container');
+      let totalExpense = 0;
+      expensesContainer.innerHTML = state.expenses.map(e => {
+        totalExpense += Number(e.cost);
+        return `
+          <div class="list-item">
             <div>
-                <div id="greeting-time">Calendar</div>
-                <h1 class="page-title">Events & Plans</h1>
+              <span>${e.name}</span>
+              <span class="badge" style="margin-left:8px;">${e.category}</span>
             </div>
-            <button class="header-icon-btn star-btn" onclick="openImportantModal()" title="View Marked Important Days">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="var(--star-red)">
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                </svg>
-            </button>
-        </header>
-
-        <div class="widget">
-            <div class="calendar-header">
-                <button class="calendar-month-btn" onclick="openIosPickerModal()">
-                    <span id="cal-month-year">July 2026</span>
-                    <span style="font-size:12px; opacity:0.6;">▼</span>
-                </button>
-            </div>
-            <div class="cal-grid">
-                <div class="cal-day-name">S</div><div class="cal-day-name">M</div>
-                <div class="cal-day-name">T</div><div class="cal-day-name">W</div>
-                <div class="cal-day-name">T</div><div class="cal-day-name">F</div>
-                <div class="cal-day-name">S</div>
-            </div>
-            <div class="cal-grid" id="cal-days-grid" style="margin-top: 6px;"></div>
-        </div>
-
-        <div class="widget">
-            <div class="schedule-header">
-                <div class="widget-label" style="margin:0;" id="agenda-date-title">Selected Day Agenda</div>
-                <button class="btn-small" onclick="openAddEventModal()">+ add event</button>
-            </div>
-            <div class="schedule-list" id="agenda-event-list"></div>
-        </div>
-    </div>
-
-    <!-- PAGE 3: NEAR FUTURE PURCHASES & PLANS -->
-    <div class="page-view" id="page-plans">
-        <header>
             <div>
-                <div id="greeting-time">Future Vision</div>
-                <h1 class="page-title">Near Future</h1>
+              <strong>$${e.cost}/mo</strong>
+              <button class="delete-btn" onclick="deleteItem('expenses', ${e.id})">✕</button>
             </div>
-        </header>
+          </div>
+        `;
+      }).join('');
 
-        <!-- Summary Header -->
-        <div class="budget-total-box">
-            <div>
-                <div style="font-size:11px; color:var(--text-accent); text-transform:uppercase; font-weight:600;">Total Planned Budget</div>
-                <div style="font-size:32px; font-weight:700; color:var(--text-primary); margin-top:2px;" id="purchases-total-amount">$0.00</div>
-            </div>
-            <div style="font-size:28px;">🛍️</div>
-        </div>
-
-        <!-- Main Near Future Purchases Section -->
-        <div class="widget">
-            <div class="schedule-header">
-                <div class="widget-label" style="margin:0;">Near Future Purchases</div>
-                <button class="btn-small" onclick="openAddPurchaseModal()">+ add item</button>
-            </div>
-            <div id="purchases-list" class="schedule-list"></div>
-        </div>
-    </div>
-
-</div>
-
-<!-- BOTTOM 3D NAVIGATION BAR -->
-<div class="bottom-nav-container">
-    <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
-        <div class="icon-3d-home">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-            </svg>
-        </div>
-    </button>
-
-    <button class="nav-btn" id="nav-cal" onclick="switchTab('calendar')">
-        <div class="icon-3d-cal">
-            <div class="icon-3d-cal-top">
-                <div class="icon-3d-cal-binder"></div>
-                <div class="icon-3d-cal-binder"></div>
-            </div>
-            <div class="icon-3d-cal-body">
-                <div class="icon-3d-cal-day" id="nav-cal-day-text">SUN</div>
-                <div class="icon-3d-cal-num" id="nav-cal-num-text">8</div>
-            </div>
-        </div>
-    </button>
-
-    <button class="nav-btn" id="nav-plans" onclick="switchTab('plans')">
-        <div class="icon-3d-plans">
-            <div class="icon-3d-plans-layer-mid"></div>
-            <div class="icon-3d-plans-layer-bot">
-                <div class="icon-3d-plans-check"></div>
-            </div>
-        </div>
-    </button>
-</div>
-
-<!-- MODALS -->
-
-<!-- Modal: Add New Main Purchase Plan Category -->
-<div class="modal-overlay" id="purchase-modal">
-    <div class="modal">
-        <h3 class="modal-title">New Purchase Category</h3>
-        <div class="form-group">
-            <label>Category / Item Group Name</label>
-            <input type="text" id="purchase-name-input" class="form-input" placeholder="e.g. Wardrobe, Tech Setup, Car Gear">
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('purchase-modal')">Cancel</button>
-            <button class="btn-primary" onclick="saveNewPurchase()">Create & Open</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Sub-Items Screen (Input Item and Price side-by-side) -->
-<div class="modal-overlay" id="item-details-modal">
-    <div class="modal">
-        <h3 class="modal-title" id="detail-item-title">Purchase Details</h3>
-        <div style="font-size:12px; color:var(--text-accent);" id="detail-item-subtitle">Manage items inside this setup</div>
-
-        <div id="sub-items-container" style="margin-top:10px; max-height:220px; overflow-y:auto;"></div>
-
-        <hr style="border:0; border-top:1px solid var(--border-color); margin:12px 0;">
-
-        <div style="font-weight:600; font-size:13px; margin-bottom:8px; text-transform:uppercase; color:var(--text-accent);">Add Sub-item & Price Side-by-Side:</div>
-        
-        <div class="side-entry-row" style="background:transparent; padding:0;">
-            <input type="text" id="sub-name-input" class="form-input" style="flex:2;" placeholder="Item Name (e.g. Jacket)">
-            <input type="number" step="0.01" id="sub-price-input" class="form-input" style="flex:1;" placeholder="Price ($)">
-        </div>
-
-        <button class="btn-primary" style="margin-top:12px; width:100%;" onclick="addSubItemToDetail()">+ Add Item</button>
-
-        <div class="modal-buttons" style="margin-top:12px;">
-            <button class="btn-secondary" onclick="closeModal('item-details-modal')">Done / Close</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Settings & Black/White Theme Switcher -->
-<div class="modal-overlay" id="settings-modal">
-    <div class="modal">
-        <h3 class="modal-title">Settings</h3>
-        <div class="form-group">
-            <label>Your Name</label>
-            <input type="text" id="setting-name-input" class="form-input">
-        </div>
-        <div class="form-group">
-            <label>Current Streak (Days)</label>
-            <input type="number" id="setting-streak-input" class="form-input">
-        </div>
-        <div class="form-group">
-            <label>Color Theme</label>
-            <select id="setting-theme-select" class="form-select">
-                <option value="dark">Dark Theme (Default)</option>
-                <option value="light">Black & White Light Theme</option>
-            </select>
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
-            <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
-        </div>
-    </div>
-</div>
-
-<!-- Other System Modals -->
-<div class="modal-overlay" id="ios-picker-modal">
-    <div class="modal">
-        <h3 class="modal-title">Select Month & Year</h3>
-        <div class="ios-picker-row">
-            <select id="picker-month-select" class="form-select" style="flex:1;">
-                <option value="0">January</option><option value="1">February</option>
-                <option value="2">March</option><option value="3">April</option>
-                <option value="4">May</option><option value="5">June</option>
-                <option value="6">July</option><option value="7">August</option>
-                <option value="8">September</option><option value="9">October</option>
-                <option value="10">November</option><option value="11">December</option>
-            </select>
-            <select id="picker-year-select" class="form-select" style="flex:1;"></select>
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('ios-picker-modal')">Cancel</button>
-            <button class="btn-primary" onclick="applyIosMonthYear()">Apply</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="event-modal">
-    <div class="modal">
-        <h3 class="modal-title">Mark Day / Event</h3>
-        <div class="form-group">
-            <label>Event Name / Highlight</label>
-            <input type="text" id="event-title-input" class="form-input" placeholder="e.g. Slim's Birthday">
-        </div>
-        <div class="form-group">
-            <label>Event Type</label>
-            <select id="event-recurring-input" class="form-select">
-                <option value="yearly">★ Recurring Yearly</option>
-                <option value="upcoming">🗓 Upcoming Event</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Tasks for this day (Comma-separated)</label>
-            <textarea id="event-tasks-input" class="form-textarea" placeholder="e.g. Buy gifts, Reserve table"></textarea>
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('event-modal')">Cancel</button>
-            <button class="btn-primary" onclick="saveNewCalendarEvent()">Save Event</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="important-modal">
-    <div class="modal">
-        <h3 class="modal-title" style="color:var(--star-red);">★ Important Days</h3>
-        <div class="star-section-title" style="font-weight:600; font-size:13px; color:var(--text-accent);">1. Yearly Recurring Days</div>
-        <div id="important-yearly-list"></div>
-        <div class="star-section-title" style="font-weight:600; font-size:13px; color:var(--text-accent); margin-top:14px;">2. Upcoming Events</div>
-        <div id="important-upcoming-list"></div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('important-modal')">Close</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="task-modal">
-    <div class="modal">
-        <h3 class="modal-title">New Task</h3>
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="task-title-input" class="form-input" placeholder="What needs to be done?">
-        </div>
-        <div class="form-group">
-            <label>Category</label>
-            <select id="task-cat-input" class="form-select">
-                <option value="Personal">Personal</option>
-                <option value="Work">Work</option>
-                <option value="Health">Health</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Priority</label>
-            <select id="task-prio-input" class="form-select">
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-            </select>
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
-            <button class="btn-primary" onclick="saveNewTask()">Add Task</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    function getData() {
-        const data = localStorage.getItem('slimDataV10');
-        return data ? JSON.parse(data) : { 
-            userName: 'Slim',
-            streak: 0,
-            verse: '', 
-            theme: 'dark',
-            events: {}, 
-            schedule: [{ time: '09:00 AM', text: 'Morning Focus' }], 
-            tasks: [{ id: 1, title: 'Build app interface', category: 'Work', priority: 'high', completed: false }],
-            futurePurchases: [
-                { id: 1, name: 'Wardrobe Essentials', items: [{ name: 'Jacket', price: 120 }, { name: 'Boots', price: 150 }] },
-                { id: 2, name: 'Tech Setup', items: [{ name: 'Monitor', price: 300 }] }
-            ]
-        };
+      document.getElementById('recurring-total').innerText = `$${totalExpense.toFixed(2)}`;
     }
 
-    function saveData(data) { localStorage.setItem('slimDataV10', JSON.stringify(data)); }
-
-    const appData = getData();
-    let currentFilter = 'all';
-    let calDate = new Date();
-    let selectedDateKey = '';
-    let activePurchaseIndex = null;
-
-    function applyTheme() {
-        if (appData.theme === 'light') {
-            document.body.classList.add('light-theme');
-        } else {
-            document.body.classList.remove('light-theme');
-        }
+    // Action Methods
+    function addNote() {
+      const title = prompt('Note Title:');
+      const desc = prompt('Note Details:');
+      if (title) {
+        state.notes.push({ id: Date.now(), title, desc: desc || '' });
+        saveState();
+      }
     }
 
-    function switchTab(tab) {
-        document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-
-        if (tab === 'home') {
-            document.getElementById('page-home').classList.add('active');
-            document.getElementById('nav-home').classList.add('active');
-        } else if (tab === 'calendar') {
-            document.getElementById('page-calendar').classList.add('active');
-            document.getElementById('nav-cal').classList.add('active');
-        } else if (tab === 'plans') {
-            document.getElementById('page-plans').classList.add('active');
-            document.getElementById('nav-plans').classList.add('active');
-        }
+    function addGoal() {
+      const title = prompt('Goal Title:');
+      const progress = prompt('Progress percentage (0-100):', '0');
+      if (title) {
+        state.goals.push({ id: Date.now(), title, progress: Number(progress) || 0 });
+        saveState();
+      }
     }
 
-    function updateHeader() {
-        const now = new Date();
-        const hours = now.getHours();
-        let greeting = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
-
-        document.getElementById('greeting-time').textContent = greeting;
-        document.getElementById('user-name').textContent = appData.userName || 'Slim';
-        document.getElementById('streak-count').textContent = appData.streak || 0;
-
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        document.getElementById('today-mon').textContent = days[now.getDay()];
-        document.getElementById('today-date').textContent = now.getDate();
-        document.getElementById('nav-cal-day-text').textContent = days[now.getDay()];
-        document.getElementById('nav-cal-num-text').textContent = now.getDate();
+    function addProject() {
+      const name = prompt('Project Name:');
+      const total = prompt('Total Estimated Budget ($):');
+      const spent = prompt('Initial Spent Amount ($):', '0');
+      if (name && total) {
+        state.projects.push({ id: Date.now(), name, total: Number(total), spent: Number(spent) });
+        saveState();
+      }
     }
 
-    // Near Future Purchases Engine
-    function renderFuturePurchases() {
-        const list = document.getElementById('purchases-list');
-        list.innerHTML = '';
-
-        let overallTotal = 0;
-
-        if (!appData.futurePurchases || appData.futurePurchases.length === 0) {
-            list.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No purchase plans added yet.</div>';
-            document.getElementById('purchases-total-amount').textContent = '$0.00';
-            return;
-        }
-
-        appData.futurePurchases.forEach((purchase, index) => {
-            const items = purchase.items || [];
-            const groupTotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
-            overallTotal += groupTotal;
-
-            const div = document.createElement('div');
-            div.className = 'plan-item';
-            div.innerHTML = `
-                <div style="flex-grow:1;" onclick="openPurchaseDetailModal(${index})">
-                    <div class="plan-item-name">${purchase.name}</div>
-                    <div style="font-size:11px; color:var(--text-accent); margin-top:3px;">${items.length} items listed</div>
-                </div>
-                <div style="display:flex; align-items:center; gap:14px;">
-                    <span class="plan-item-cost" onclick="openPurchaseDetailModal(${index})">$${groupTotal.toFixed(2)}</span>
-                    <button class="schedule-delete" onclick="deletePurchaseGroup(${index})">&times;</button>
-                </div>
-            `;
-            list.appendChild(div);
-        });
-
-        document.getElementById('purchases-total-amount').textContent = `$${overallTotal.toFixed(2)}`;
+    function addExpense() {
+      const name = prompt('Expense Name (e.g. Electric Bill, Grocery):');
+      const category = prompt('Category (Bills, Subscriptions, Shopping):', 'Bills');
+      const cost = prompt('Monthly Cost ($):');
+      if (name && cost) {
+        state.expenses.push({ id: Date.now(), name, category: category || 'General', cost: Number(cost) });
+        saveState();
+      }
     }
 
-    function openAddPurchaseModal() {
-        document.getElementById('purchase-name-input').value = '';
-        document.getElementById('purchase-modal').classList.add('open');
+    function deleteItem(type, id) {
+      state[type] = state[type].filter(item => item.id !== id);
+      saveState();
     }
 
-    function saveNewPurchase() {
-        const name = document.getElementById('purchase-name-input').value.trim();
-
-        if (name) {
-            if (!appData.futurePurchases) appData.futurePurchases = [];
-            const newIndex = appData.futurePurchases.length;
-            appData.futurePurchases.push({ id: Date.now(), name, items: [] });
-            saveData(appData);
-            renderFuturePurchases();
-            closeModal('purchase-modal');
-            openPurchaseDetailModal(newIndex);
-        }
-    }
-
-    function deletePurchaseGroup(index) {
-        appData.futurePurchases.splice(index, 1);
-        saveData(appData);
-        renderFuturePurchases();
-    }
-
-    // Detail View: Side-by-side Input Page
-    function openPurchaseDetailModal(index) {
-        activePurchaseIndex = index;
-        const group = appData.futurePurchases[index];
-
-        document.getElementById('detail-item-title').textContent = group.name;
-        document.getElementById('sub-name-input').value = '';
-        document.getElementById('sub-price-input').value = '';
-
-        renderSubItems();
-        document.getElementById('item-details-modal').classList.add('open');
-    }
-
-    function renderSubItems() {
-        const container = document.getElementById('sub-items-container');
-        container.innerHTML = '';
-        const group = appData.futurePurchases[activePurchaseIndex];
-
-        if (!group.items || group.items.length === 0) {
-            container.innerHTML = '<div style="font-size:13px; color:var(--text-accent);">No individual items added yet.</div>';
-            return;
-        }
-
-        group.items.forEach((item, sIdx) => {
-            const row = document.createElement('div');
-            row.className = 'side-entry-row';
-            row.innerHTML = `
-                <div style="font-size:15px; font-weight:500; flex:2;">${item.name}</div>
-                <div style="font-weight:700; font-size:15px; flex:1; text-align:right;">$${parseFloat(item.price || 0).toFixed(2)}</div>
-                <button class="schedule-delete" onclick="deleteSubItem(${sIdx})">&times;</button>
-            `;
-            container.appendChild(row);
-        });
-    }
-
-    function addSubItemToDetail() {
-        const name = document.getElementById('sub-name-input').value.trim();
-        const price = parseFloat(document.getElementById('sub-price-input').value) || 0;
-
-        if (name) {
-            const group = appData.futurePurchases[activePurchaseIndex];
-            if (!group.items) group.items = [];
-
-            group.items.push({ name, price });
-            saveData(appData);
-
-            document.getElementById('sub-name-input').value = '';
-            document.getElementById('sub-price-input').value = '';
-
-            renderSubItems();
-            renderFuturePurchases();
-        }
-    }
-
-    function deleteSubItem(sIdx) {
-        const group = appData.futurePurchases[activePurchaseIndex];
-        group.items.splice(sIdx, 1);
-        saveData(appData);
-        renderSubItems();
-        renderFuturePurchases();
-    }
-
-    // Calendar Engine
-    function renderCalendar() {
-        const year = calDate.getFullYear();
-        const month = calDate.getMonth();
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-        document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
-
-        const grid = document.getElementById('cal-days-grid');
-        grid.innerHTML = '';
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const totalDays = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
-
-        for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
-
-        for (let day = 1; day <= totalDays; day++) {
-            const dayEl = document.createElement('div');
-            dayEl.className = 'cal-day';
-
-            const numSpan = document.createElement('span');
-            numSpan.textContent = day;
-            dayEl.appendChild(numSpan);
-
-            const monthStr = String(month + 1).padStart(2, '0');
-            const dayStr = String(day).padStart(2, '0');
-            const dateKey = `${year}-${monthStr}-${dayStr}`;
-            const mmdd = `${monthStr}-${dayStr}`;
-
-            if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) dayEl.classList.add('today');
-            if (selectedDateKey === dateKey) dayEl.classList.add('selected');
-
-            let foundFirstName = '';
-            let hasEvents = false;
-
-            Object.keys(appData.events || {}).forEach(k => {
-                if (k === dateKey || k.endsWith(mmdd)) {
-                    hasEvents = true;
-                    appData.events[k].forEach(ev => {
-                        if (ev.type === 'yearly' && !foundFirstName) foundFirstName = ev.title.split(' ')[0];
-                    });
-                }
-            });
-
-            if (hasEvents) dayEl.classList.add('has-event');
-
-            if (foundFirstName) {
-                const nameTag = document.createElement('div');
-                nameTag.className = 'cal-day-name-tag';
-                nameTag.textContent = foundFirstName;
-                dayEl.appendChild(nameTag);
-            }
-
-            dayEl.onclick = () => selectCalendarDate(dateKey, day, monthNames[month], year);
-            grid.appendChild(dayEl);
-        }
-
-        if (!selectedDateKey) {
-            const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            selectCalendarDate(todayKey, today.getDate(), monthNames[today.getMonth()], today.getFullYear());
-        }
-    }
-
-    function selectCalendarDate(dateKey, day, monthName, year) {
-        selectedDateKey = dateKey;
-        document.getElementById('agenda-date-title').textContent = `${monthName} ${day}, ${year}`;
-        renderAgendaList();
-        renderCalendar();
-    }
-
-    function renderAgendaList() {
-        const container = document.getElementById('agenda-event-list');
-        container.innerHTML = '';
-
-        const monthDayStr = selectedDateKey.substring(5);
-        let currentDayEvents = [];
-
-        Object.keys(appData.events || {}).forEach(k => {
-            if (k === selectedDateKey || k.endsWith(monthDayStr)) {
-                appData.events[k].forEach((ev, idx) => {
-                    currentDayEvents.push({ key: k, index: idx, event: ev });
-                });
-            }
-        });
-
-        if (currentDayEvents.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No events saved for this day.</div>';
-            return;
-        }
-
-        currentDayEvents.forEach((itemObj) => {
-            const ev = itemObj.event;
-            const div = document.createElement('div');
-            div.className = 'schedule-item';
-
-            let tasksHtml = ev.tasks && ev.tasks.length > 0 ? `<div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">📋 Tasks: ${ev.tasks.join(', ')}</div>` : '';
-            let badgeText = ev.type === 'yearly' ? '🔁 Yearly' : '🗓 Event';
-
-            div.innerHTML = `
-                <div class="schedule-item-top">
-                    <span class="schedule-text">★ ${ev.title} <small style="font-size:10px; opacity:0.6; margin-left:4px;">(${badgeText})</small></span>
-                    <button class="schedule-delete" onclick="deleteCalendarEvent('${itemObj.key}', ${itemObj.index})">&times;</button>
-                </div>
-                ${tasksHtml}
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function openAddEventModal() {
-        document.getElementById('event-title-input').value = '';
-        document.getElementById('event-tasks-input').value = '';
-        document.getElementById('event-modal').classList.add('open');
-    }
-
-    function saveNewCalendarEvent() {
-        const title = document.getElementById('event-title-input').value.trim();
-        const type = document.getElementById('event-recurring-input').value;
-        const rawTasks = document.getElementById('event-tasks-input').value.trim();
-
-        if (title) {
-            if (!appData.events) appData.events = {};
-            if (!appData.events[selectedDateKey]) appData.events[selectedDateKey] = [];
-
-            const tasksList = rawTasks ? rawTasks.split(',').map(t => t.trim()).filter(t => t.length > 0) : [];
-
-            appData.events[selectedDateKey].push({ title, type, tasks: tasksList });
-            saveData(appData);
-
-            renderAgendaList();
-            renderCalendar();
-            closeModal('event-modal');
-        }
-    }
-
-    function deleteCalendarEvent(key, index) {
-        if (appData.events && appData.events[key]) {
-            appData.events[key].splice(index, 1);
-            if (appData.events[key].length === 0) delete appData.events[key];
-            saveData(appData);
-            renderAgendaList();
-            renderCalendar();
-        }
-    }
-
-    function openIosPickerModal() {
-        const monthSel = document.getElementById('picker-month-select');
-        const yearSel = document.getElementById('picker-year-select');
-
-        monthSel.value = calDate.getMonth();
-        yearSel.innerHTML = '';
-
-        const currentYear = new Date().getFullYear();
-        for (let y = currentYear - 5; y <= currentYear + 10; y++) {
-            const opt = document.createElement('option');
-            opt.value = y; opt.textContent = y;
-            if (y === calDate.getFullYear()) opt.selected = true;
-            yearSel.appendChild(opt);
-        }
-
-        document.getElementById('ios-picker-modal').classList.add('open');
-    }
-
-    function applyIosMonthYear() {
-        calDate.setFullYear(parseInt(document.getElementById('picker-year-select').value, 10));
-        calDate.setMonth(parseInt(document.getElementById('picker-month-select').value, 10));
-        renderCalendar();
-        closeModal('ios-picker-modal');
-    }
-
-    function openImportantModal() {
-        const yearlyList = document.getElementById('important-yearly-list');
-        const upcomingList = document.getElementById('important-upcoming-list');
-        yearlyList.innerHTML = ''; upcomingList.innerHTML = '';
-
-        let yearlyCount = 0, upcomingCount = 0;
-
-        Object.keys(appData.events || {}).sort().forEach(dateKey => {
-            appData.events[dateKey].forEach(ev => {
-                const item = document.createElement('div');
-                item.className = 'important-list-item';
-
-                let taskDetail = ev.tasks && ev.tasks.length > 0 ? `<div style="font-size:12px; color:var(--text-secondary);">Tasks: ${ev.tasks.join(', ')}</div>` : '';
-
-                if (ev.type === 'yearly') {
-                    yearlyCount++;
-                    item.innerHTML = `<div class="important-date">Every Year on ${dateKey.substring(5)}</div><div class="important-title">★ ${ev.title}</div>${taskDetail}`;
-                    yearlyList.appendChild(item);
-                } else {
-                    upcomingCount++;
-                    item.innerHTML = `<div class="important-date">${dateKey}</div><div class="important-title">🗓 ${ev.title}</div>${taskDetail}`;
-                    upcomingList.appendChild(item);
-                }
-            });
-        });
-
-        if (yearlyCount === 0) yearlyList.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No yearly recurring events set.</div>';
-        if (upcomingCount === 0) upcomingList.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No upcoming one-time events set.</div>';
-
-        document.getElementById('important-modal').classList.add('open');
-    }
-
-    // Schedule System
-    function renderSchedule() {
-        const container = document.getElementById('schedule-list');
-        container.innerHTML = '';
-        if (appData.schedule.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No schedule items set.</div>';
-            return;
-        }
-        appData.schedule.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'schedule-item';
-            div.style.flexDirection = 'row';
-            div.style.justifyContent = 'space-between';
-            div.innerHTML = `
-                <span class="schedule-time">${item.time}</span>
-                <span class="schedule-text" style="flex-grow:1; margin-left:12px;">${item.text}</span>
-                <button class="schedule-delete" onclick="deleteScheduleItem(${index})">&times;</button>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function addScheduleItem() {
-        const time = prompt('Time slot (e.g., 10:30 AM):', '10:00 AM');
-        if (!time) return;
-        const text = prompt('Event description:', 'Meeting / Work');
-        if (text) {
-            appData.schedule.push({ time, text });
-            saveData(appData);
-            renderSchedule();
-        }
-    }
-
-    function deleteScheduleItem(index) {
-        appData.schedule.splice(index, 1);
-        saveData(appData);
-        renderSchedule();
-    }
-
-    // Task System
-    function setFilter(filter, btn) {
-        currentFilter = filter;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderTasks();
-    }
-
-    function renderTasks() {
-        const taskList = document.getElementById('task-list');
-        taskList.innerHTML = '';
-
-        const filteredTasks = appData.tasks.filter(t => {
-            if (currentFilter === 'active') return !t.completed;
-            if (currentFilter === 'completed') return t.completed;
-            return true;
-        });
-
-        filteredTasks.forEach((task) => {
-            const index = appData.tasks.findIndex(t => t.id === task.id);
-            const li = document.createElement('li');
-            li.className = `task-item ${task.completed ? 'completed' : ''}`;
-            li.innerHTML = `
-                <div class="task-left">
-                    <div class="task-checkbox" onclick="toggleTask(${index})"></div>
-                    <div class="task-content">
-                        <span class="task-title">${task.title}</span>
-                        <div class="task-meta">
-                            <span>${task.category}</span> &middot; 
-                            <span class="badge badge-${task.priority}">${task.priority}</span>
-                        </div>
-                    </div>
-                </div>
-                <button class="task-delete" onclick="deleteTask(${index})">&times;</button>
-            `;
-            taskList.appendChild(li);
-        });
-    }
-
-    function openAddTaskModal() { document.getElementById('task-modal').classList.add('open'); }
-
-    function saveNewTask() {
-        const title = document.getElementById('task-title-input').value.trim();
-        const category = document.getElementById('task-cat-input').value;
-        const priority = document.getElementById('task-prio-input').value;
-
-        if (title) {
-            appData.tasks.unshift({ id: Date.now(), title, category, priority, completed: false });
-            saveData(appData);
-            renderTasks();
-            document.getElementById('task-title-input').value = '';
-            closeModal('task-modal');
-        }
-    }
-
-    function toggleTask(index) {
-        appData.tasks[index].completed = !appData.tasks[index].completed;
-        saveData(appData);
-        renderTasks();
-    }
-
-    function deleteTask(index) {
-        appData.tasks.splice(index, 1);
-        saveData(appData);
-        renderTasks();
-    }
-
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-    function openSettingsModal() {
-        document.getElementById('setting-name-input').value = appData.userName || 'Slim';
-        document.getElementById('setting-streak-input').value = appData.streak || 0;
-        document.getElementById('setting-theme-select').value = appData.theme || 'dark';
-        document.getElementById('settings-modal').classList.add('open');
-    }
-
-    function saveSettings() {
-        const name = document.getElementById('setting-name-input').value.trim();
-        const streak = parseInt(document.getElementById('setting-streak-input').value, 10);
-        const theme = document.getElementById('setting-theme-select').value;
-
-        if (name) appData.userName = name;
-        if (!isNaN(streak)) appData.streak = streak;
-        appData.theme = theme;
-
-        saveData(appData);
-        applyTheme();
-        updateHeader();
-        closeModal('settings-modal');
-    }
-
-    // Verse Handler
-    const verseInput = document.getElementById('verse-input');
-    verseInput.value = appData.verse || '';
-    verseInput.addEventListener('input', () => {
-        appData.verse = verseInput.value;
-        saveData(appData);
-    });
-
-    // Init App
-    applyTheme();
-    updateHeader();
-    renderCalendar();
-    renderSchedule();
-    renderTasks();
-    renderFuturePurchases();
-</script>
-
+    // Initialize App
+    render();
+  </script>
 </body>
 </html>
