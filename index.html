@@ -614,6 +614,10 @@
 </head>
 <body>
 
+<div id="loading-screen" style="position:fixed; inset:0; background:var(--bg-color); display:flex; align-items:center; justify-content:center; z-index:999; color:var(--text-secondary); font-size:14px;">
+    Loading your data…
+</div>
+
 <div class="container">
 
     <!-- PAGE 0: LOGIN / SIGNUP -->
@@ -833,7 +837,7 @@
             <input type="text" id="expense-name-input" class="form-input" placeholder="e.g. Internet, Netflix">
         </div>
         <div class="form-group">
-            <label>Amount ($)</label>
+            <label>Amount</label>
             <input type="number" step="0.01" id="expense-amount-input" class="form-input" placeholder="0.00">
         </div>
         <div class="form-group">
@@ -867,8 +871,8 @@
                 <input type="number" id="sub-qty-input" class="form-input" placeholder="Qty (e.g. 1)" value="1">
             </div>
             <div class="form-group">
-                <label>Price ($)</label>
-                <input type="number" step="0.01" id="sub-price-input" class="form-input" placeholder="Price ($)">
+                <label>Price</label>
+                <input type="number" step="0.01" id="sub-price-input" class="form-input" placeholder="Price">
             </div>
         </div>
 
@@ -949,7 +953,7 @@
         </div>
         <div class="form-group">
             <label>Estimated Cost (Optional)</label>
-            <input type="text" id="purchase-cost-input" class="form-input" placeholder="e.g. $1,200 or 1200">
+            <input type="text" id="purchase-cost-input" class="form-input" placeholder="e.g. 1200">
         </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('purchase-modal')">Cancel</button>
@@ -1010,6 +1014,15 @@
                 <option value="light">Light Theme</option>
             </select>
         </div>
+        <div class="form-group">
+            <label>Currency</label>
+            <select id="setting-currency-input" class="form-select">
+                <option value="USD">USD ($)</option>
+                <option value="AUD">AUD (A$)</option>
+                <option value="KSH">KSH (KSh)</option>
+            </select>
+        </div>
+        <div style="font-size:12px; color:var(--text-accent); text-align:center;" id="sync-status-text">Checking sync status…</div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
             <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
@@ -1019,14 +1032,18 @@
 </div>
 
 <script>
-    function getData() {
-        const data = localStorage.getItem('slimDataV10');
-        return data ? JSON.parse(data) : { 
+    const STORAGE_KEY = 'slimDataV10';
+    const cloudAvailable = typeof window.storage !== 'undefined';
+    let syncState = 'local'; // 'local' | 'synced' | 'error'
+
+    function defaultData() {
+        return {
             userName: 'Slim',
             gmail: '',
             isLoggedIn: false,
             theme: 'dark',
             glassBlur: 2,
+            currency: 'USD',
             streak: 0,
             verse: '', 
             events: {}, 
@@ -1046,9 +1063,67 @@
         };
     }
 
-    function saveData(data) { localStorage.setItem('slimDataV10', JSON.stringify(data)); }
+    // Loads data from Claude cloud storage (synced across devices) when available,
+    // otherwise falls back to this browser's local storage.
+    async function loadData() {
+        if (cloudAvailable) {
+            try {
+                const result = await window.storage.get(STORAGE_KEY, false);
+                if (result && result.value) {
+                    syncState = 'synced';
+                    return JSON.parse(result.value);
+                }
+            } catch (err) {
+                // No cloud record yet - check if there's local data to migrate up
+                try {
+                    const local = localStorage.getItem(STORAGE_KEY);
+                    if (local) {
+                        const parsed = JSON.parse(local);
+                        await window.storage.set(STORAGE_KEY, JSON.stringify(parsed), false);
+                        syncState = 'synced';
+                        return parsed;
+                    }
+                } catch (e2) { /* ignore, fall through to defaults */ }
+            }
+            syncState = 'synced';
+            return defaultData();
+        }
+        const local = localStorage.getItem(STORAGE_KEY);
+        syncState = 'local';
+        return local ? JSON.parse(local) : defaultData();
+    }
 
-    const appData = getData();
+    // Saves data. Fire-and-forget: appData in memory already reflects the change,
+    // so UI doesn't need to wait on the network round trip.
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        if (cloudAvailable) {
+            window.storage.set(STORAGE_KEY, JSON.stringify(data), false)
+                .then(() => { syncState = 'synced'; updateSyncBadge(); })
+                .catch(err => { syncState = 'error'; updateSyncBadge(); console.error('Cloud save failed', err); });
+        }
+    }
+
+    function updateSyncBadge() {
+        const badge = document.getElementById('sync-status-text');
+        if (!badge) return;
+        if (!cloudAvailable) badge.textContent = 'Saved on this device only (no cloud sync available)';
+        else if (syncState === 'synced') badge.textContent = '☁ Synced to your Claude account';
+        else if (syncState === 'error') badge.textContent = '⚠ Sync failed, saved locally';
+        else badge.textContent = 'Saving…';
+    }
+
+    const CURRENCY_SYMBOLS = { USD: '$', AUD: 'A$', KSH: 'KSh ' };
+
+    function getCurrencySymbol() {
+        return CURRENCY_SYMBOLS[appData.currency] || '$';
+    }
+
+    function formatMoney(amount) {
+        return `${getCurrencySymbol()}${(parseFloat(amount) || 0).toFixed(2)}`;
+    }
+
+    let appData = defaultData();
     let currentFilter = 'all';
     let calDate = new Date();
     let selectedDateKey = '';
@@ -1207,7 +1282,7 @@
                     <div style="font-size:11px; color:var(--text-accent); margin-top:2px;">${dueText}${subCountText}</div>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <span class="plan-item-cost" ${clickHandler}>$${totalItemPrice.toFixed(2)}</span>
+                    <span class="plan-item-cost" ${clickHandler}>${formatMoney(totalItemPrice)}</span>
                     <button class="schedule-delete" onclick="event.stopPropagation(); deleteCategoryExpense('${type}', ${index});">&times;</button>
                 </div>
             `;
@@ -1222,7 +1297,7 @@
                 total += parseFloat(item.amount) || 0;
             });
         });
-        document.getElementById('monthly-total-amount').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('monthly-total-amount').textContent = formatMoney(total);
     }
 
     function openAddExpenseModal(type) {
@@ -1296,7 +1371,7 @@
                     <div>
                         <div class="sub-item-title-text" style="font-size:14px; font-weight:500;">${sub.name}</div>
                         <div class="sub-item-badge">Qty: ${sub.qty || 1}</div>
-                        <div style="font-weight:600; font-size:13px; color:var(--gold-accent); margin-top:4px;">$${itemTotal}</div>
+                        <div style="font-weight:600; font-size:13px; color:var(--gold-accent); margin-top:4px;">${formatMoney(itemTotal)}</div>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
@@ -1329,7 +1404,7 @@
 
             if (activeDetailObj.type === 'futurePurchases') {
                 const subTotal = item.items.reduce((sum, s) => sum + (parseFloat(s.price || 0) * (parseInt(s.qty) || 1)), 0);
-                if (subTotal > 0) item.cost = `$${subTotal.toFixed(2)}`;
+                if (subTotal > 0) item.cost = formatMoney(subTotal);
             }
 
             saveData(appData);
@@ -1350,7 +1425,7 @@
 
         if (activeDetailObj.type === 'futurePurchases') {
             const subTotal = item.items.reduce((sum, s) => sum + (parseFloat(s.price || 0) * (parseInt(s.qty) || 1)), 0);
-            item.cost = subTotal > 0 ? `$${subTotal.toFixed(2)}` : item.cost;
+            item.cost = subTotal > 0 ? formatMoney(subTotal) : item.cost;
         }
 
         saveData(appData);
@@ -1399,8 +1474,8 @@
         let cost = document.getElementById('purchase-cost-input').value.trim();
 
         if (name) {
-            if (cost && !cost.startsWith('$') && !isNaN(cost)) {
-                cost = `$${parseFloat(cost).toFixed(2)}`;
+            if (cost && !isNaN(cost)) {
+                cost = formatMoney(parseFloat(cost));
             }
 
             if (!appData.futurePurchases) appData.futurePurchases = [];
@@ -1748,6 +1823,7 @@
         document.getElementById('setting-gmail-input').value = appData.gmail || '';
         document.getElementById('setting-streak-input').value = appData.streak || 0;
         document.getElementById('setting-theme-input').value = appData.theme || 'dark';
+        document.getElementById('setting-currency-input').value = appData.currency || 'USD';
         document.getElementById('settings-modal').classList.add('open');
     }
 
@@ -1756,13 +1832,17 @@
         const gmail = document.getElementById('setting-gmail-input').value.trim();
         const streak = parseInt(document.getElementById('setting-streak-input').value, 10);
         const theme = document.getElementById('setting-theme-input').value;
+        const currency = document.getElementById('setting-currency-input').value;
 
         if (name) appData.userName = name;
         appData.gmail = gmail;
         if (!isNaN(streak)) appData.streak = streak;
         appData.theme = theme;
+        appData.currency = currency;
 
         saveData(appData);
+        renderCategorizedBudget();
+        renderFuturePurchases();
         applyTheme();
         updateHeader();
         closeModal('settings-modal');
@@ -1774,23 +1854,34 @@
         return s[(v - 20) % 10] || s[v] || s[0];
     }
 
-    // Verse Input Handler
-    const verseInput = document.getElementById('verse-input');
-    verseInput.value = appData.verse || '';
-    verseInput.addEventListener('input', () => {
-        appData.verse = verseInput.value;
-        saveData(appData);
-    });
+    // App Initialization - waits for cloud/local data before rendering anything
+    async function initApp() {
+        const loadingEl = document.getElementById('loading-screen');
 
-    // App Initialization
-    applyTheme();
-    updateHeader();
-    renderCalendar();
-    renderSchedule();
-    renderTasks();
-    renderFuturePurchases();
-    renderCategorizedBudget();
-    checkAuth();
+        appData = await loadData();
+
+        // Verse Input Handler
+        const verseInput = document.getElementById('verse-input');
+        verseInput.value = appData.verse || '';
+        verseInput.addEventListener('input', () => {
+            appData.verse = verseInput.value;
+            saveData(appData);
+        });
+
+        applyTheme();
+        updateHeader();
+        renderCalendar();
+        renderSchedule();
+        renderTasks();
+        renderFuturePurchases();
+        renderCategorizedBudget();
+        checkAuth();
+        updateSyncBadge();
+
+        if (loadingEl) loadingEl.style.display = 'none';
+    }
+
+    initApp();
 </script>
 
 </body>
