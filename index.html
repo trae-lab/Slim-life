@@ -20,7 +20,7 @@
             --star-red: #ff3b30;
             --gold-accent: #f7d070;
             --purple-accent: #9d73f7;
-            --glass-blur: 16px;
+            --glass-blur: 2px;
         }
 
         body.light-theme {
@@ -32,21 +32,6 @@
             --text-secondary: #555555;
             --text-accent: #8e8e93;
             --border-color: rgba(0, 0, 0, 0.1);
-        }
-
-        body.bw-theme {
-            --bg-color: #000000;
-            --widget-bg: rgba(17, 17, 17, 0.75);
-            --task-bg: rgba(31, 31, 31, 0.75);
-            --modal-bg: rgba(17, 17, 17, 0.9);
-            --text-primary: #ffffff;
-            --text-secondary: #cccccc;
-            --text-accent: #888888;
-            --border-color: rgba(255, 255, 255, 0.2);
-            --accent-color: #ffffff;
-            --star-red: #ffffff;
-            --gold-accent: #ffffff;
-            --purple-accent: #ffffff;
         }
 
         * {
@@ -606,11 +591,6 @@
             color: var(--text-primary); font-size: 15px; outline: none; font-family: inherit;
         }
 
-        .form-range {
-            width: 100%;
-            accent-color: var(--accent-color);
-        }
-
         .ios-picker-row { display: flex; gap: 10px; }
         .ios-picker-row select, .ios-picker-row input { flex: 1; }
 
@@ -881,7 +861,7 @@
         <div class="form-group">
             <input type="text" id="sub-name-input" class="form-input" placeholder="Item name (e.g. Milk, Keyboard)">
         </div>
-        <div class="ios-picker-row" style="margin-top:6px;">
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:6px;">
             <div class="form-group">
                 <label>Quantity</label>
                 <input type="number" id="sub-qty-input" class="form-input" placeholder="Qty (e.g. 1)" value="1">
@@ -1028,12 +1008,7 @@
             <select id="setting-theme-input" class="form-select">
                 <option value="dark">Dark Theme (Default)</option>
                 <option value="light">Light Theme</option>
-                <option value="bw">Black & White Theme</option>
             </select>
-        </div>
-        <div class="form-group">
-            <label>Frosted Glass Blur: <span id="blur-val-disp">16px</span></label>
-            <input type="range" min="0" max="30" id="setting-blur-input" class="form-range" oninput="updateGlassBlur(this.value)">
         </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
@@ -1051,7 +1026,7 @@
             gmail: '',
             isLoggedIn: false,
             theme: 'dark',
-            glassBlur: 16,
+            glassBlur: 2,
             streak: 0,
             verse: '', 
             events: {}, 
@@ -1081,19 +1056,15 @@
     let currentAuthMode = 'login';
 
     function applyTheme() {
-        document.body.classList.remove('light-theme', 'bw-theme');
+        document.body.classList.remove('light-theme');
         if (appData.theme === 'light') {
             document.body.classList.add('light-theme');
-        } else if (appData.theme === 'bw') {
-            document.body.classList.add('bw-theme');
         }
-        updateGlassBlur(appData.glassBlur || 16);
+        updateGlassBlur(appData.glassBlur || 2);
     }
 
     function updateGlassBlur(val) {
         document.documentElement.style.setProperty('--glass-blur', `${val}px`);
-        const disp = document.getElementById('blur-val-disp');
-        if (disp) disp.textContent = `${val}px`;
         appData.glassBlur = parseInt(val, 10);
     }
 
@@ -1325,10 +1296,10 @@
                     <div>
                         <div class="sub-item-title-text" style="font-size:14px; font-weight:500;">${sub.name}</div>
                         <div class="sub-item-badge">Qty: ${sub.qty || 1}</div>
+                        <div style="font-weight:600; font-size:13px; color:var(--gold-accent); margin-top:4px;">$${itemTotal}</div>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:600; font-size:14px; color:var(--gold-accent);">$${itemTotal}</span>
                     <button class="schedule-delete" onclick="event.stopPropagation(); deleteSubItem(${sIdx});">&times;</button>
                 </div>
             `;
@@ -1777,8 +1748,6 @@
         document.getElementById('setting-gmail-input').value = appData.gmail || '';
         document.getElementById('setting-streak-input').value = appData.streak || 0;
         document.getElementById('setting-theme-input').value = appData.theme || 'dark';
-        document.getElementById('setting-blur-input').value = appData.glassBlur || 16;
-        document.getElementById('blur-val-disp').textContent = `${appData.glassBlur || 16}px`;
         document.getElementById('settings-modal').classList.add('open');
     }
 
