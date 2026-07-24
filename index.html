@@ -33,6 +33,21 @@
             --border-color: #d1d1d6;
         }
 
+        body.bw-theme {
+            --bg-color: #000000;
+            --widget-bg: #111111;
+            --task-bg: #1f1f1f;
+            --modal-bg: #111111;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-accent: #888888;
+            --border-color: #ffffff;
+            --accent-color: #ffffff;
+            --star-red: #ffffff;
+            --gold-accent: #ffffff;
+            --purple-accent: #ffffff;
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -372,6 +387,27 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .sub-item-card.completed .sub-item-title-text {
+            text-decoration: line-through;
+            color: var(--text-accent);
+        }
+
+        .sub-item-card.completed .sub-item-checkbox {
+            border-color: var(--text-accent);
+            background-color: var(--text-accent);
+        }
+
+        .sub-item-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-accent);
+            border-radius: 50%;
+            background-color: transparent;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
 
         .sub-item-badge {
@@ -381,7 +417,8 @@
             font-weight: 600;
             padding: 2px 8px;
             border-radius: 10px;
-            margin-left: 8px;
+            margin-top: 2px;
+            display: inline-block;
         }
 
         /* Bottom Navigation Bar */
@@ -398,7 +435,7 @@
             border-radius: 28px;
             padding: 8px 20px;
             display: flex;
-            justify-content: space-around;
+            justify-style: space-around;
             align-items: center;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
@@ -506,7 +543,7 @@
             color: var(--text-primary); font-size: 15px; outline: none; font-family: inherit;
         }
 
-        .ios-picker-row { display: flex; gap: 10px; }
+        .ios-picker-row { display: flex; flex-direction: column; gap: 10px; }
         .ios-picker-row select, .ios-picker-row input { flex: 1; }
 
         .modal-buttons { display: flex; gap: 10px; margin-top: 8px; }
@@ -751,8 +788,14 @@
             <input type="text" id="sub-name-input" class="form-input" placeholder="Item name (e.g. Milk, Keyboard)">
         </div>
         <div class="ios-picker-row" style="margin-top:6px;">
-            <input type="number" id="sub-qty-input" class="form-input" placeholder="Qty (e.g. 1)" value="1">
-            <input type="number" step="0.01" id="sub-price-input" class="form-input" placeholder="Price ($)">
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="sub-qty-input" class="form-input" placeholder="Qty (e.g. 1)" value="1">
+            </div>
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" step="0.01" id="sub-price-input" class="form-input" placeholder="Price ($)">
+            </div>
         </div>
 
         <button class="btn-primary" style="margin-top:10px; width:100%;" onclick="addSubItemToDetail()">+ Add Item</button>
@@ -879,8 +922,20 @@
             <input type="text" id="setting-name-input" class="form-input">
         </div>
         <div class="form-group">
+            <label>Gmail Account</label>
+            <input type="email" id="setting-gmail-input" class="form-input" placeholder="user@gmail.com">
+        </div>
+        <div class="form-group">
             <label>Current Streak (Days)</label>
             <input type="number" id="setting-streak-input" class="form-input">
+        </div>
+        <div class="form-group">
+            <label>Theme</label>
+            <select id="setting-theme-input" class="form-select">
+                <option value="dark">Dark Theme (Default)</option>
+                <option value="light">Light Theme</option>
+                <option value="bw">Black & White Theme</option>
+            </select>
         </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
@@ -894,6 +949,8 @@
         const data = localStorage.getItem('slimDataV9');
         return data ? JSON.parse(data) : { 
             userName: 'Slim',
+            gmail: '',
+            theme: 'dark',
             streak: 0,
             verse: '', 
             events: {}, 
@@ -908,7 +965,7 @@
                 { id: 2, name: 'Netflix', amount: 15.99, dueDay: 12 }
             ],
             shopping: [
-                { id: 3, name: 'Monthly Groceries', amount: 150.00, dueDay: 1, items: [{ name: 'Steak', qty: 2, price: 20.00 }, { name: 'Rice', qty: 1, price: 10.00 }] }
+                { id: 3, name: 'Monthly Groceries', amount: 150.00, dueDay: 1, items: [{ name: 'Steak', qty: 2, price: 20.00, completed: false }, { name: 'Rice', qty: 1, price: 10.00, completed: false }] }
             ]
         };
     }
@@ -920,6 +977,15 @@
     let calDate = new Date();
     let selectedDateKey = '';
     let activeDetailObj = null; 
+
+    function applyTheme() {
+        document.body.classList.remove('light-theme', 'bw-theme');
+        if (appData.theme === 'light') {
+            document.body.classList.add('light-theme');
+        } else if (appData.theme === 'bw') {
+            document.body.classList.add('bw-theme');
+        }
+    }
 
     function switchTab(tab) {
         document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
@@ -1067,21 +1133,38 @@
 
         item.items.forEach((sub, sIdx) => {
             const row = document.createElement('div');
-            row.className = 'sub-item-card';
+            row.className = `sub-item-card ${sub.completed ? 'completed' : ''}`;
             const itemTotal = (parseFloat(sub.price || 0) * (parseInt(sub.qty) || 1)).toFixed(2);
+
+            row.onclick = (e) => {
+                if (e.target.classList.contains('schedule-delete')) return;
+                toggleSubItem(sIdx);
+            };
 
             row.innerHTML = `
                 <div style="display:flex; align-items:center;">
-                    <span style="font-size:14px; font-weight:500; color:var(--text-primary);">${sub.name}</span>
-                    <span class="sub-item-badge">×${sub.qty || 1}</span>
+                    <div class="sub-item-checkbox"></div>
+                    <div>
+                        <div class="sub-item-title-text" style="font-size:14px; font-weight:500;">${sub.name}</div>
+                        <div class="sub-item-badge">Qty: ${sub.qty || 1}</div>
+                    </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <span style="font-weight:600; font-size:14px; color:var(--gold-accent);">$${itemTotal}</span>
-                    <button class="schedule-delete" onclick="deleteSubItem(${sIdx})">&times;</button>
+                    <button class="schedule-delete" onclick="event.stopPropagation(); deleteSubItem(${sIdx});">&times;</button>
                 </div>
             `;
             container.appendChild(row);
         });
+    }
+
+    function toggleSubItem(sIdx) {
+        const item = appData[activeDetailObj.type][activeDetailObj.index];
+        if (item.items && item.items[sIdx]) {
+            item.items[sIdx].completed = !item.items[sIdx].completed;
+            saveData(appData);
+            renderSubItems();
+        }
     }
 
     function addSubItemToDetail() {
@@ -1093,7 +1176,7 @@
             const item = appData[activeDetailObj.type][activeDetailObj.index];
             if (!item.items) item.items = [];
 
-            item.items.push({ name, qty, price });
+            item.items.push({ name, qty, price, completed: false });
 
             // Calculate total cost if adding to wishlist item
             if (activeDetailObj.type === 'futurePurchases') {
@@ -1349,8 +1432,7 @@
         monthSel.value = calDate.getMonth();
         yearSel.innerHTML = '';
 
-        const currentYear = new Date().getFullYear();
-        for (let y = currentYear - 5; y <= currentYear + 10; y++) {
+        for (let y = 2000; y <= 2050; y++) {
             const opt = document.createElement('option');
             opt.value = y; opt.textContent = y;
             if (y === calDate.getFullYear()) opt.selected = true;
@@ -1509,18 +1591,25 @@
 
     function openSettingsModal() {
         document.getElementById('setting-name-input').value = appData.userName || 'Slim';
+        document.getElementById('setting-gmail-input').value = appData.gmail || '';
         document.getElementById('setting-streak-input').value = appData.streak || 0;
+        document.getElementById('setting-theme-input').value = appData.theme || 'dark';
         document.getElementById('settings-modal').classList.add('open');
     }
 
     function saveSettings() {
         const name = document.getElementById('setting-name-input').value.trim();
+        const gmail = document.getElementById('setting-gmail-input').value.trim();
         const streak = parseInt(document.getElementById('setting-streak-input').value, 10);
+        const theme = document.getElementById('setting-theme-input').value;
 
         if (name) appData.userName = name;
+        appData.gmail = gmail;
         if (!isNaN(streak)) appData.streak = streak;
+        appData.theme = theme;
 
         saveData(appData);
+        applyTheme();
         updateHeader();
         closeModal('settings-modal');
     }
@@ -1540,6 +1629,7 @@
     });
 
     // App Initialization
+    applyTheme();
     updateHeader();
     renderCalendar();
     renderSchedule();
