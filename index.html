@@ -546,9 +546,63 @@
             transform: rotate(-45deg) translate(1px, -1px);
         }
 
+        .icon-3d-notes {
+            width: 44px; height: 44px;
+            position: relative;
+        }
+
+        .icon-3d-notes-paper {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 3px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+        }
+
+        .icon-3d-notes-paper-back {
+            width: 22px; height: 26px;
+            top: 3px; left: 16px;
+            background: #e4e4e6;
+            transform: rotate(12deg);
+        }
+
+        .icon-3d-notes-paper-front {
+            width: 24px; height: 27px;
+            top: 4px; left: 9px;
+            transform: rotate(-6deg);
+            padding: 5px 4px 0 5px;
+            box-sizing: border-box;
+        }
+
+        .icon-3d-notes-line {
+            height: 2px;
+            background: #c7c7c9;
+            border-radius: 1px;
+            margin-bottom: 3px;
+        }
+
+        .icon-3d-notes-folder {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 27px;
+            background: linear-gradient(150deg, rgba(48,48,53,0.92), rgba(10,10,12,0.96));
+            border-radius: 13px 13px 10px 10px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+
+        .icon-3d-notes-folder::before {
+            content: '';
+            position: absolute;
+            top: -6px; left: 6px;
+            width: 16px; height: 8px;
+            background: rgba(48,48,53,0.92);
+            border-radius: 6px 6px 0 0;
+        }
+
         .nav-btn.active .icon-3d-home,
         .nav-btn.active .icon-3d-cal,
-        .nav-btn.active .icon-3d-plans { 
+        .nav-btn.active .icon-3d-plans,
+        .nav-btn.active .icon-3d-notes { 
             outline: 2px solid var(--accent-color); 
             outline-offset: 3px; 
         }
@@ -790,6 +844,43 @@
         </div>
     </div>
 
+    <!-- PAGE 4: NOTES -->
+    <div class="page-view" id="page-notes">
+        <header>
+            <div>
+                <div id="greeting-time">Jot it down</div>
+                <h1 class="page-title">Notes</h1>
+            </div>
+        </header>
+
+        <!-- Section 1: Notes -->
+        <div class="widget glass-panel">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Notes</div>
+                <button class="btn-small" onclick="openAddNoteModal()">+ add note</button>
+            </div>
+            <div id="notes-list" class="schedule-list"></div>
+        </div>
+
+        <!-- Section 2: To-Do List -->
+        <div class="widget glass-panel">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">To-Do List</div>
+                <button class="btn-small" onclick="openAddNotesTodoModal()">+ add</button>
+            </div>
+            <div id="notes-todo-list" class="schedule-list"></div>
+        </div>
+
+        <!-- Section 3: Future Plans -->
+        <div class="widget glass-panel">
+            <div class="schedule-header">
+                <div class="widget-label" style="margin:0;">Future Plans</div>
+                <button class="btn-small" onclick="openAddNotesPlanModal()">+ add plan</button>
+            </div>
+            <div id="notes-plan-list" class="schedule-list"></div>
+        </div>
+    </div>
+
 </div>
 
 <!-- BOTTOM 3D NAVIGATION BAR (FROSTED GLASS, EQUALLY SPACED) -->
@@ -821,6 +912,18 @@
             <div class="icon-3d-plans-layer-bot">
                 <div class="icon-3d-plans-check"></div>
             </div>
+        </div>
+    </button>
+
+    <button class="nav-btn" id="nav-notes" onclick="switchTab('notes')">
+        <div class="icon-3d-notes">
+            <div class="icon-3d-notes-paper icon-3d-notes-paper-back"></div>
+            <div class="icon-3d-notes-paper icon-3d-notes-paper-front">
+                <div class="icon-3d-notes-line" style="width:75%;"></div>
+                <div class="icon-3d-notes-line" style="width:55%;"></div>
+                <div class="icon-3d-notes-line" style="width:65%;"></div>
+            </div>
+            <div class="icon-3d-notes-folder"></div>
         </div>
     </button>
 </div>
@@ -992,6 +1095,56 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="note-modal">
+    <div class="modal">
+        <h3 class="modal-title">New Note</h3>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="note-title-input" class="form-input" placeholder="e.g. Ideas, Reminders">
+        </div>
+        <div class="form-group">
+            <label>Note</label>
+            <textarea id="note-content-input" class="form-textarea" style="min-height:100px;" placeholder="Write your note..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('note-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewNote()">Save Note</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="notes-todo-modal">
+    <div class="modal">
+        <h3 class="modal-title">New To-Do</h3>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="notes-todo-title-input" class="form-input" placeholder="What needs to be done?">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('notes-todo-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewNotesTodo()">Add To-Do</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="notes-plan-modal">
+    <div class="modal">
+        <h3 class="modal-title">New Future Plan</h3>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="notes-plan-title-input" class="form-input" placeholder="e.g. Learn guitar, Visit Japan">
+        </div>
+        <div class="form-group">
+            <label>Notes (Optional)</label>
+            <textarea id="notes-plan-note-input" class="form-textarea" placeholder="Any details..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('notes-plan-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewNotesPlan()">Add Plan</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="settings-modal">
     <div class="modal">
         <h3 class="modal-title">Settings</h3>
@@ -1059,7 +1212,10 @@
             ],
             shopping: [
                 { id: 3, name: 'Monthly Groceries', amount: 150.00, dueDay: 1, items: [{ name: 'Steak', qty: 2, price: 20.00, completed: false }, { name: 'Rice', qty: 1, price: 10.00, completed: false }] }
-            ]
+            ],
+            notes: [],
+            notesTodos: [],
+            notesFuturePlans: []
         };
     }
 
@@ -1224,6 +1380,9 @@
         } else if (tab === 'plans') {
             document.getElementById('page-plans').classList.add('active');
             document.getElementById('nav-plans').classList.add('active');
+        } else if (tab === 'notes') {
+            document.getElementById('page-notes').classList.add('active');
+            document.getElementById('nav-notes').classList.add('active');
         }
     }
 
@@ -1816,6 +1975,165 @@
         renderTasks();
     }
 
+    /* Notes Page: Free-form Notes */
+    function renderNotesList() {
+        const container = document.getElementById('notes-list');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const notes = appData.notes || [];
+        if (notes.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No notes yet.</div>';
+            return;
+        }
+
+        notes.forEach((note, index) => {
+            const div = document.createElement('div');
+            div.className = 'schedule-item';
+            div.innerHTML = `
+                <div class="schedule-item-top">
+                    <span class="schedule-text">${note.title}</span>
+                    <button class="schedule-delete" onclick="deleteNote(${index})">&times;</button>
+                </div>
+                ${note.content ? `<div style="font-size:13px; color:var(--text-secondary); white-space:pre-wrap;">${note.content}</div>` : ''}
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function openAddNoteModal() {
+        document.getElementById('note-title-input').value = '';
+        document.getElementById('note-content-input').value = '';
+        document.getElementById('note-modal').classList.add('open');
+    }
+
+    function saveNewNote() {
+        const title = document.getElementById('note-title-input').value.trim();
+        const content = document.getElementById('note-content-input').value.trim();
+
+        if (title) {
+            if (!appData.notes) appData.notes = [];
+            appData.notes.unshift({ id: Date.now(), title, content });
+            saveData(appData);
+            renderNotesList();
+            closeModal('note-modal');
+        }
+    }
+
+    function deleteNote(index) {
+        appData.notes.splice(index, 1);
+        saveData(appData);
+        renderNotesList();
+    }
+
+    /* Notes Page: Independent To-Do List */
+    function renderNotesTodos() {
+        const container = document.getElementById('notes-todo-list');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const todos = appData.notesTodos || [];
+        if (todos.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No to-do items yet.</div>';
+            return;
+        }
+
+        todos.forEach((todo, index) => {
+            const div = document.createElement('div');
+            div.className = 'task-item' + (todo.completed ? ' completed' : '');
+            div.innerHTML = `
+                <div class="task-left">
+                    <div class="task-checkbox" onclick="toggleNotesTodo(${index})"></div>
+                    <div class="task-content">
+                        <span class="task-title">${todo.title}</span>
+                    </div>
+                </div>
+                <button class="task-delete" onclick="deleteNotesTodo(${index})">&times;</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function openAddNotesTodoModal() {
+        document.getElementById('notes-todo-title-input').value = '';
+        document.getElementById('notes-todo-modal').classList.add('open');
+    }
+
+    function saveNewNotesTodo() {
+        const title = document.getElementById('notes-todo-title-input').value.trim();
+
+        if (title) {
+            if (!appData.notesTodos) appData.notesTodos = [];
+            appData.notesTodos.unshift({ id: Date.now(), title, completed: false });
+            saveData(appData);
+            renderNotesTodos();
+            closeModal('notes-todo-modal');
+        }
+    }
+
+    function toggleNotesTodo(index) {
+        appData.notesTodos[index].completed = !appData.notesTodos[index].completed;
+        saveData(appData);
+        renderNotesTodos();
+    }
+
+    function deleteNotesTodo(index) {
+        appData.notesTodos.splice(index, 1);
+        saveData(appData);
+        renderNotesTodos();
+    }
+
+    /* Notes Page: Independent Future Plans */
+    function renderNotesPlans() {
+        const container = document.getElementById('notes-plan-list');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const plans = appData.notesFuturePlans || [];
+        if (plans.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No future plans added yet.</div>';
+            return;
+        }
+
+        plans.forEach((plan, index) => {
+            const div = document.createElement('div');
+            div.className = 'plan-item';
+            div.innerHTML = `
+                <div style="flex-grow:1;">
+                    <div class="plan-item-name">${plan.title}</div>
+                    ${plan.note ? `<div style="font-size:11px; color:var(--text-accent); margin-top:2px;">${plan.note}</div>` : ''}
+                </div>
+                <button class="schedule-delete" onclick="deleteNotesPlan(${index})">&times;</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function openAddNotesPlanModal() {
+        document.getElementById('notes-plan-title-input').value = '';
+        document.getElementById('notes-plan-note-input').value = '';
+        document.getElementById('notes-plan-modal').classList.add('open');
+    }
+
+    function saveNewNotesPlan() {
+        const title = document.getElementById('notes-plan-title-input').value.trim();
+        const note = document.getElementById('notes-plan-note-input').value.trim();
+
+        if (title) {
+            if (!appData.notesFuturePlans) appData.notesFuturePlans = [];
+            appData.notesFuturePlans.unshift({ id: Date.now(), title, note });
+            saveData(appData);
+            renderNotesPlans();
+            closeModal('notes-plan-modal');
+        }
+    }
+
+    function deleteNotesPlan(index) {
+        appData.notesFuturePlans.splice(index, 1);
+        saveData(appData);
+        renderNotesPlans();
+    }
+
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
     function openSettingsModal() {
@@ -1875,6 +2193,9 @@
         renderTasks();
         renderFuturePurchases();
         renderCategorizedBudget();
+        renderNotesList();
+        renderNotesTodos();
+        renderNotesPlans();
         checkAuth();
         updateSyncBadge();
 
