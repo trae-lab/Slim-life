@@ -6,32 +6,41 @@
     <title>Personal Dashboard - Slim</title>
     <style>
         :root {
-            --bg-color: #0b0b0d;
-            --widget-bg: rgba(22, 22, 25, 0.65);
-            --task-bg: rgba(34, 34, 38, 0.6);
-            --modal-bg: rgba(28, 28, 32, 0.85);
-            --text-primary: #ffffff;
-            --text-secondary: #999999;
-            --text-accent: #666666;
-            --border-color: rgba(255, 255, 255, 0.12);
+            --bg-color: #26262a;
+            --widget-bg: #26262a;
+            --task-bg: #26262a;
+            --modal-bg: #26262a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a3a3a8;
+            --text-accent: #7a7a80;
+            --border-color: rgba(255, 255, 255, 0.06);
             --border-radius: 24px;
             --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             --accent-color: #ff5e3a;
-            --star-red: #ff3b30;
+            --star-red: #ff6b57;
             --gold-accent: #f7d070;
             --purple-accent: #9d73f7;
             --glass-blur: 2px;
+            --neu-dark: rgba(0, 0, 0, 0.55);
+            --neu-light: rgba(255, 255, 255, 0.045);
+            --neu-dark-soft: rgba(0, 0, 0, 0.4);
+            --neu-light-soft: rgba(255, 255, 255, 0.03);
         }
 
         body.light-theme {
-            --bg-color: #e5e5ea;
-            --widget-bg: rgba(255, 255, 255, 0.65);
-            --task-bg: rgba(230, 230, 235, 0.7);
-            --modal-bg: rgba(255, 255, 255, 0.88);
-            --text-primary: #000000;
-            --text-secondary: #555555;
-            --text-accent: #8e8e93;
-            --border-color: rgba(0, 0, 0, 0.1);
+            --bg-color: #e4e4e8;
+            --widget-bg: #e4e4e8;
+            --task-bg: #e4e4e8;
+            --modal-bg: #e4e4e8;
+            --text-primary: #2c2c2a;
+            --text-secondary: #5f5e5a;
+            --text-accent: #888780;
+            --border-color: rgba(0, 0, 0, 0.05);
+            --star-red: #d8503a;
+            --neu-dark: #c3c3c8;
+            --neu-light: #ffffff;
+            --neu-dark-soft: #cfcfd3;
+            --neu-light-soft: #ffffff;
         }
 
         * {
@@ -41,9 +50,6 @@
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 10% 20%, rgba(157, 115, 247, 0.15) 0%, transparent 40%),
-                              radial-gradient(circle at 90% 80%, rgba(255, 94, 58, 0.15) 0%, transparent 40%);
-            background-attachment: fixed;
             color: var(--text-primary);
             font-family: var(--font-family);
             margin: 0;
@@ -65,10 +71,8 @@
         /* Frosted Glass Class */
         .glass-panel {
             background: var(--widget-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+            border: none;
+            box-shadow: 8px 8px 16px var(--neu-dark), -8px -8px 16px var(--neu-light);
         }
 
         /* Authentication View */
@@ -200,6 +204,200 @@
             font-size: 14px;
         }
 
+        /* Streak Card */
+        .streak-card-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .streak-flame {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, rgba(255,140,80,0.35), rgba(255,94,58,0.12) 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            filter: drop-shadow(0 0 10px rgba(255, 94, 58, 0.55));
+            flex-shrink: 0;
+        }
+
+        .streak-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-accent);
+            font-weight: 600;
+        }
+
+        .streak-days {
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .streak-days span { font-size: 30px; }
+
+        .streak-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 16px 0 14px;
+        }
+
+        .streak-week-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .streak-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .streak-day-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--task-bg);
+            border: 2px solid transparent;
+            transition: transform 0.15s ease, background-color 0.2s ease;
+        }
+
+        .streak-day:active .streak-day-circle { transform: scale(0.9); }
+
+        .streak-day-circle.completed {
+            background: linear-gradient(135deg, var(--accent-color), #ff8a5c);
+            box-shadow: 0 4px 10px rgba(255, 94, 58, 0.35);
+        }
+
+        .streak-day-circle.completed::after {
+            content: '✓';
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .streak-day-circle.today-pending {
+            background-color: transparent;
+            border: 2px solid var(--accent-color);
+        }
+
+        .streak-day-label {
+            font-size: 11px;
+            color: var(--text-accent);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Notes Masonry Grid */
+        .notes-search-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .notes-masonry {
+            column-count: 2;
+            column-gap: 12px;
+        }
+
+        .note-card {
+            break-inside: avoid;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: var(--task-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .note-card.accent {
+            background: linear-gradient(135deg, var(--accent-color), var(--purple-accent));
+            border: none;
+        }
+
+        .note-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .note-card.accent .note-card-title,
+        .note-card.accent .note-card-content,
+        .note-card.accent .note-card-footer { color: #ffffff; }
+
+        .note-card-content {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        .note-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 10px;
+            color: var(--text-accent);
+        }
+
+        .note-card-delete {
+            background: none;
+            border: none;
+            color: inherit;
+            opacity: 0.6;
+            cursor: pointer;
+            font-size: 15px;
+            padding: 0;
+        }
+
+        .note-card-checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .note-checklist-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-checklist-row .task-checkbox {
+            width: 18px; height: 18px;
+        }
+
+        .note-checklist-row span {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .note-checklist-row.completed span {
+            text-decoration: line-through;
+            color: var(--text-accent);
+        }
+
+        .note-checklist-row.completed .task-checkbox {
+            background-color: #ffffff;
+            border-color: #ffffff;
+        }
+
         .text-input {
             width: 100%;
             border: none;
@@ -229,7 +427,7 @@
         .calendar-month-btn {
             font-size: 20px;
             font-weight: 600;
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--widget-bg);
             padding: 6px 16px;
             border-radius: 16px;
             cursor: pointer;
@@ -237,8 +435,8 @@
             align-items: center;
             gap: 8px;
             color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(8px);
+            border: none;
+            box-shadow: 4px 4px 8px var(--neu-dark-soft), -4px -4px 8px var(--neu-light-soft);
         }
 
         .cal-grid {
@@ -467,15 +665,13 @@
             width: calc(100% - 32px);
             max-width: 440px;
             background: var(--widget-bg);
-            backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
-            -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
             border-radius: 36px;
             padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: none;
+            box-shadow: 8px 8px 16px var(--neu-dark), -8px -8px 16px var(--neu-light);
             z-index: 90;
         }
 
@@ -610,9 +806,7 @@
         /* Modals */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
-            -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+            background-color: rgba(0, 0, 0, 0.55);
             display: flex; justify-content: center; align-items: flex-end;
             opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 100;
         }
@@ -621,15 +815,13 @@
 
         .modal {
             background-color: var(--modal-bg);
-            backdrop-filter: blur(calc(var(--glass-blur) * 1.8));
-            -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.8));
-            border: 1px solid var(--border-color);
+            border: none;
             width: 100%; max-width: 480px;
             border-top-left-radius: 28px; border-top-right-radius: 28px;
             padding: 24px; display: flex; flex-direction: column; gap: 16px;
             transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
             max-height: 85vh; overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 -8px 20px var(--neu-dark-soft);
         }
 
         .modal-overlay.open .modal { transform: translateY(0); }
@@ -664,6 +856,110 @@
         .important-list-item { background-color: var(--task-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 14px; margin-top: 8px; }
         .important-date { font-size: 11px; color: var(--accent-color); font-weight: 600; }
         .important-title { font-size: 15px; font-weight: 500; margin-top: 2px; }
+
+        /* Neumorphic reskin: flat surfaces + embossed shadow pairs instead of glass/blur */
+
+        .auth-toggle-btn.active,
+        .filter-btn.active {
+            background-color: var(--widget-bg);
+            box-shadow: inset 3px 3px 6px var(--neu-dark-soft), inset -3px -3px 6px var(--neu-light-soft);
+        }
+
+        .btn-small,
+        .btn-secondary,
+        .calendar-month-btn {
+            background-color: var(--widget-bg);
+            border: none;
+            box-shadow: 4px 4px 8px var(--neu-dark-soft), -4px -4px 8px var(--neu-light-soft);
+        }
+
+        .btn-small:active,
+        .btn-secondary:active {
+            box-shadow: inset 3px 3px 6px var(--neu-dark-soft), inset -3px -3px 6px var(--neu-light-soft);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            box-shadow: 4px 4px 8px var(--neu-dark-soft), -4px -4px 8px var(--neu-light-soft);
+        }
+
+        .btn-primary:active {
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3), inset -3px -3px 6px rgba(255,255,255,0.08);
+        }
+
+        .task-item, .schedule-item, .cal-day, .plan-item, .sub-item-card,
+        .note-card, .important-list-item, .budget-total-box, .swatch-card {
+            background-color: var(--widget-bg);
+            border: none;
+            box-shadow: 5px 5px 10px var(--neu-dark-soft), -5px -5px 10px var(--neu-light-soft);
+        }
+
+        .note-card.accent { box-shadow: 5px 5px 10px var(--neu-dark-soft), -5px -5px 10px var(--neu-light-soft); }
+
+        .cal-day.selected { box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3), inset -3px -3px 6px rgba(255,255,255,0.08); }
+
+        .form-input, .form-select, .form-textarea {
+            background-color: var(--widget-bg);
+            border: none;
+            box-shadow: inset 3px 3px 6px var(--neu-dark-soft), inset -3px -3px 6px var(--neu-light-soft);
+        }
+
+        .task-checkbox, .sub-item-checkbox, .note-checklist-row .task-checkbox {
+            border: none;
+            background-color: var(--widget-bg);
+            box-shadow: inset 2px 2px 4px var(--neu-dark-soft), inset -2px -2px 4px var(--neu-light-soft);
+        }
+
+        .task-item.completed .task-checkbox,
+        .sub-item-card.completed .sub-item-checkbox,
+        .note-checklist-row.completed .task-checkbox {
+            background-color: var(--widget-bg);
+            box-shadow: inset 2px 2px 4px var(--neu-dark-soft), inset -2px -2px 4px var(--neu-light-soft);
+            position: relative;
+        }
+
+        .task-item.completed .task-checkbox::after,
+        .sub-item-card.completed .sub-item-checkbox::after,
+        .note-checklist-row.completed .task-checkbox::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 45%; height: 45%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background-color: var(--accent-color);
+        }
+
+        .streak-day-circle {
+            box-shadow: 4px 4px 8px var(--neu-dark-soft), -4px -4px 8px var(--neu-light-soft);
+        }
+
+        .streak-day-circle.completed {
+            background: var(--widget-bg);
+            box-shadow: inset 3px 3px 6px var(--neu-dark-soft), inset -3px -3px 6px var(--neu-light-soft);
+        }
+
+        .streak-day-circle.completed::after { color: var(--accent-color); }
+
+        .streak-day-circle.today-pending {
+            background: var(--widget-bg);
+            border: none;
+            box-shadow: 4px 4px 8px var(--neu-dark-soft), -4px -4px 8px var(--neu-light-soft), inset 0 0 0 2px var(--accent-color);
+        }
+
+        .streak-flame {
+            background: var(--widget-bg);
+            box-shadow: inset 3px 3px 6px var(--neu-dark-soft), inset -3px -3px 6px var(--neu-light-soft);
+            filter: none;
+        }
+
+        .header-icon-btn.gear-icon svg,
+        .header-icon-btn.star-btn svg { filter: none; }
+
+        .icon-3d-home, .icon-3d-cal, .icon-3d-plans, .icon-3d-notes-folder {
+            box-shadow: 3px 3px 6px var(--neu-dark-soft), -3px -3px 6px var(--neu-light-soft) !important;
+        }
     </style>
 </head>
 <body>
@@ -714,6 +1010,32 @@
             </button>
         </header>
 
+        <!-- Streak Card -->
+        <div class="widget glass-panel streak-card">
+            <div class="streak-card-top">
+                <div class="streak-flame">🔥</div>
+                <div>
+                    <div class="streak-label">Streak</div>
+                    <div class="streak-days"><span id="streak-days-num">0</span> Days</div>
+                </div>
+            </div>
+            <div class="streak-divider"></div>
+            <div class="streak-week-row" id="streak-week-row"></div>
+        </div>
+
+        <!-- Daily / Weekly Routine -->
+        <div class="widget glass-panel">
+            <div class="tasks-header">
+                <div class="widget-label" style="margin:0;">Routine</div>
+                <button class="btn-small" onclick="openAddRoutineModal()">+ add</button>
+            </div>
+            <div class="task-filters" id="routine-filters">
+                <button class="filter-btn active" onclick="setRoutineView('daily', this)">Daily</button>
+                <button class="filter-btn" onclick="setRoutineView('weekly', this)">Weekly</button>
+            </div>
+            <ul id="routine-list" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;"></ul>
+        </div>
+
         <div class="grid-2">
             <div class="widget glass-panel">
                 <div class="widget-label">Today</div>
@@ -741,7 +1063,7 @@
                 <div class="widget-label" style="margin:0;">Today's Tasks</div>
                 <button class="btn-small" onclick="openAddTaskModal()">+ add</button>
             </div>
-            <div class="task-filters">
+            <div class="task-filters" id="task-filters">
                 <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
                 <button class="filter-btn" onclick="setFilter('active', this)">Active</button>
                 <button class="filter-btn" onclick="setFilter('completed', this)">Done</button>
@@ -853,31 +1175,24 @@
             </div>
         </header>
 
-        <!-- Section 1: Notes -->
+        <!-- Section 1: Notes, To-Do & Future Plans (unified card grid) -->
         <div class="widget glass-panel">
             <div class="schedule-header">
                 <div class="widget-label" style="margin:0;">Notes</div>
-                <button class="btn-small" onclick="openAddNoteModal()">+ add note</button>
+                <button class="btn-small" id="notes-add-btn" onclick="handleNotesAddClick()">+ add note</button>
             </div>
-            <div id="notes-list" class="schedule-list"></div>
-        </div>
 
-        <!-- Section 2: To-Do List -->
-        <div class="widget glass-panel">
-            <div class="schedule-header">
-                <div class="widget-label" style="margin:0;">To-Do List</div>
-                <button class="btn-small" onclick="openAddNotesTodoModal()">+ add</button>
+            <div class="notes-search-row">
+                <input type="text" id="notes-search-input" class="form-input" placeholder="Search notes..." oninput="renderNotesGrid()">
+                <div class="task-filters">
+                    <button class="filter-btn active" onclick="setNotesFilter('all', this)">All</button>
+                    <button class="filter-btn" onclick="setNotesFilter('notes', this)">Notes</button>
+                    <button class="filter-btn" onclick="setNotesFilter('todo', this)">To-Do</button>
+                    <button class="filter-btn" onclick="setNotesFilter('plans', this)">Plans</button>
+                </div>
             </div>
-            <div id="notes-todo-list" class="schedule-list"></div>
-        </div>
 
-        <!-- Section 3: Future Plans -->
-        <div class="widget glass-panel">
-            <div class="schedule-header">
-                <div class="widget-label" style="margin:0;">Future Plans</div>
-                <button class="btn-small" onclick="openAddNotesPlanModal()">+ add plan</button>
-            </div>
-            <div id="notes-plan-list" class="schedule-list"></div>
+            <div id="notes-list" class="notes-masonry"></div>
         </div>
     </div>
 
@@ -1097,7 +1412,7 @@
 
 <div class="modal-overlay" id="note-modal">
     <div class="modal">
-        <h3 class="modal-title">New Note</h3>
+        <h3 class="modal-title" id="note-modal-title">New Note</h3>
         <div class="form-group">
             <label>Title</label>
             <input type="text" id="note-title-input" class="form-input" placeholder="e.g. Ideas, Reminders">
@@ -1108,7 +1423,7 @@
         </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('note-modal')">Cancel</button>
-            <button class="btn-primary" onclick="saveNewNote()">Save Note</button>
+            <button class="btn-primary" id="note-modal-save-btn" onclick="saveNewNote()">Save Note</button>
         </div>
     </div>
 </div>
@@ -1141,6 +1456,20 @@
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('notes-plan-modal')">Cancel</button>
             <button class="btn-primary" onclick="saveNewNotesPlan()">Add Plan</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="routine-modal">
+    <div class="modal">
+        <h3 class="modal-title" id="routine-modal-title">New Routine Item</h3>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="routine-title-input" class="form-input" placeholder="e.g. Stretch, Read 10 pages">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('routine-modal')">Cancel</button>
+            <button class="btn-primary" onclick="saveNewRoutineItem()">Add Item</button>
         </div>
     </div>
 </div>
@@ -1215,7 +1544,12 @@
             ],
             notes: [],
             notesTodos: [],
-            notesFuturePlans: []
+            notesFuturePlans: [],
+            streakDays: { Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false, Sun: false },
+            streakWeekStart: null,
+            lastRoutineCompleteDate: null,
+            dailyRoutine: [],
+            weeklyRoutine: []
         };
     }
 
@@ -1911,7 +2245,7 @@
     /* Task System */
     function setFilter(filter, btn) {
         currentFilter = filter;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#task-filters .filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         renderTasks();
     }
@@ -1975,35 +2309,319 @@
         renderTasks();
     }
 
-    /* Notes Page: Free-form Notes */
-    function renderNotesList() {
+    /* Streak Card - auto-tracked from Daily Routine completion */
+    const STREAK_DAY_ORDER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    function getDateKey(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function getTodayDateKey() { return getDateKey(new Date()); }
+
+    function getYesterdayDateKey() {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        return getDateKey(d);
+    }
+
+    function getMondayDateKey() {
+        const d = new Date();
+        const day = d.getDay(); // 0=Sun..6=Sat
+        const diffToMonday = (day === 0 ? -6 : 1) - day;
+        d.setDate(d.getDate() + diffToMonday);
+        return getDateKey(d);
+    }
+
+    // Resets the week's day-circles when a new week (Mon) begins
+    function ensureCurrentStreakWeek() {
+        if (!appData.streakDays) {
+            appData.streakDays = { Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false, Sun: false };
+        }
+        const mondayKey = getMondayDateKey();
+        if (appData.streakWeekStart !== mondayKey) {
+            appData.streakDays = { Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false, Sun: false };
+            appData.streakWeekStart = mondayKey;
+        }
+    }
+
+    function isDailyRoutineFullyComplete() {
+        const items = appData.dailyRoutine || [];
+        return items.length > 0 && items.every(i => i.completed);
+    }
+
+    // Call whenever the Daily Routine checklist changes - keeps the streak
+    // number and this week's day-circles in sync with actual completion,
+    // no manual tapping required.
+    function updateStreakFromRoutine() {
+        ensureCurrentStreakWeek();
+
+        const todayKey = getTodayDateKey();
+        const fullyComplete = isDailyRoutineFullyComplete();
+        const alreadyCountedToday = appData.lastRoutineCompleteDate === todayKey;
+
+        if (fullyComplete && !alreadyCountedToday) {
+            const yesterdayKey = getYesterdayDateKey();
+            appData.streak = (appData.lastRoutineCompleteDate === yesterdayKey) ? (appData.streak || 0) + 1 : 1;
+            appData.lastRoutineCompleteDate = todayKey;
+        } else if (!fullyComplete && alreadyCountedToday) {
+            // Something got unchecked after today was already counted - undo the credit
+            appData.streak = Math.max(0, (appData.streak || 0) - 1);
+            appData.lastRoutineCompleteDate = null;
+        }
+
+        const jsDay = new Date().getDay();
+        const todayName = STREAK_DAY_ORDER[jsDay === 0 ? 6 : jsDay - 1];
+        appData.streakDays[todayName] = fullyComplete;
+
+        saveData(appData);
+        renderStreakCard();
+    }
+
+    function renderStreakCard() {
+        const numEl = document.getElementById('streak-days-num');
+        const row = document.getElementById('streak-week-row');
+        if (!numEl || !row) return;
+
+        ensureCurrentStreakWeek();
+        numEl.textContent = appData.streak || 0;
+
+        // JS getDay(): 0=Sun...6=Sat. Convert to Mon-first index.
+        const jsDay = new Date().getDay();
+        const todayIndex = jsDay === 0 ? 6 : jsDay - 1;
+
+        row.innerHTML = '';
+        STREAK_DAY_ORDER.forEach((day, idx) => {
+            const completed = !!appData.streakDays[day];
+            const isToday = idx === todayIndex;
+
+            const col = document.createElement('div');
+            col.className = 'streak-day';
+
+            const circleClass = completed ? 'completed' : (isToday ? 'today-pending' : '');
+
+            col.innerHTML = `
+                <div class="streak-day-circle ${circleClass}"></div>
+                <div class="streak-day-label">${day}</div>
+            `;
+            row.appendChild(col);
+        });
+    }
+
+    /* Daily / Weekly Routine */
+    let currentRoutineView = 'daily';
+
+    function setRoutineView(view, btn) {
+        currentRoutineView = view;
+        document.querySelectorAll('#routine-filters .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderRoutine();
+    }
+
+    function getRoutineList() {
+        const key = currentRoutineView === 'daily' ? 'dailyRoutine' : 'weeklyRoutine';
+        if (!appData[key]) appData[key] = [];
+        return appData[key];
+    }
+
+    function renderRoutine() {
+        const list = document.getElementById('routine-list');
+        if (!list) return;
+        list.innerHTML = '';
+
+        const items = getRoutineList();
+        if (items.length === 0) {
+            list.innerHTML = `<div style="color:var(--text-accent); font-size:13px;">No ${currentRoutineView} routine items yet.</div>`;
+            return;
+        }
+
+        items.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.className = 'task-item' + (item.completed ? ' completed' : '');
+            li.innerHTML = `
+                <div class="task-left">
+                    <div class="task-checkbox" onclick="toggleRoutineItem(${index})"></div>
+                    <div class="task-content">
+                        <span class="task-title">${item.title}</span>
+                    </div>
+                </div>
+                <button class="task-delete" onclick="deleteRoutineItem(${index})">&times;</button>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function openAddRoutineModal() {
+        document.getElementById('routine-modal-title').textContent = currentRoutineView === 'daily' ? 'New Daily Routine Item' : 'New Weekly Routine Item';
+        document.getElementById('routine-title-input').value = '';
+        document.getElementById('routine-modal').classList.add('open');
+    }
+
+    function saveNewRoutineItem() {
+        const title = document.getElementById('routine-title-input').value.trim();
+        if (title) {
+            getRoutineList().unshift({ id: Date.now(), title, completed: false });
+            saveData(appData);
+            renderRoutine();
+            closeModal('routine-modal');
+            if (currentRoutineView === 'daily') updateStreakFromRoutine();
+        }
+    }
+
+    function toggleRoutineItem(index) {
+        const items = getRoutineList();
+        items[index].completed = !items[index].completed;
+        saveData(appData);
+        renderRoutine();
+        if (currentRoutineView === 'daily') updateStreakFromRoutine();
+    }
+
+    function deleteRoutineItem(index) {
+        getRoutineList().splice(index, 1);
+        saveData(appData);
+        renderRoutine();
+        if (currentRoutineView === 'daily') updateStreakFromRoutine();
+    }
+
+    /* Notes Page: Unified card grid (Notes + To-Do List) */
+    let notesFilter = 'all';
+
+    function setNotesFilter(filter, btn) {
+        notesFilter = filter;
+        document.querySelectorAll('.notes-search-row .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateNotesAddButton();
+        renderNotesGrid();
+    }
+
+    function updateNotesAddButton() {
+        const btn = document.getElementById('notes-add-btn');
+        if (!btn) return;
+        if (notesFilter === 'todo') btn.textContent = '+ add to-do';
+        else if (notesFilter === 'plans') btn.textContent = '+ add plan';
+        else btn.textContent = '+ add note';
+    }
+
+    function handleNotesAddClick() {
+        if (notesFilter === 'todo') openAddNotesTodoModal();
+        else if (notesFilter === 'plans') openAddNotesPlanModal();
+        else openAddNoteModal();
+    }
+
+    function renderNotesGrid() {
         const container = document.getElementById('notes-list');
         if (!container) return;
         container.innerHTML = '';
 
+        const searchInput = document.getElementById('notes-search-input');
+        const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+
         const notes = appData.notes || [];
-        if (notes.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No notes yet.</div>';
-            return;
+        const todos = appData.notesTodos || [];
+        const plans = appData.notesFuturePlans || [];
+
+        let cardsAdded = 0;
+
+        // To-Do List card (single grouped card, filtered by search on item titles)
+        if (notesFilter === 'all' || notesFilter === 'todo') {
+            const matchingTodos = query ? todos.filter(t => t.title.toLowerCase().includes(query)) : todos;
+            if (!query || matchingTodos.length > 0) {
+                const card = document.createElement('div');
+                card.className = 'note-card accent';
+
+                let rowsHtml = '';
+                if (matchingTodos.length === 0) {
+                    rowsHtml = `<div style="font-size:12px; opacity:0.85;">No to-do items yet.</div>`;
+                } else {
+                    matchingTodos.forEach((todo) => {
+                        const realIndex = todos.indexOf(todo);
+                        rowsHtml += `
+                            <div class="note-checklist-row ${todo.completed ? 'completed' : ''}">
+                                <div class="task-checkbox" style="border-color:#fff;" onclick="toggleNotesTodo(${realIndex})"></div>
+                                <span>${todo.title}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                card.innerHTML = `
+                    <div class="note-card-title">To-Do List</div>
+                    <div class="note-card-checklist">${rowsHtml}</div>
+                    <div class="note-card-footer">
+                        <span>${todos.length} item${todos.length === 1 ? '' : 's'}</span>
+                        <button class="note-card-delete" onclick="openAddNotesTodoModal()">+</button>
+                    </div>
+                `;
+                container.appendChild(card);
+                cardsAdded++;
+            }
         }
 
-        notes.forEach((note, index) => {
-            const div = document.createElement('div');
-            div.className = 'schedule-item';
-            div.innerHTML = `
-                <div class="schedule-item-top">
-                    <span class="schedule-text">${note.title}</span>
-                    <button class="schedule-delete" onclick="deleteNote(${index})">&times;</button>
-                </div>
-                ${note.content ? `<div style="font-size:13px; color:var(--text-secondary); white-space:pre-wrap;">${note.content}</div>` : ''}
-            `;
-            container.appendChild(div);
-        });
+        // Individual note cards (click to edit)
+        if (notesFilter === 'all' || notesFilter === 'notes') {
+            const matchingNotes = query
+                ? notes.filter(n => n.title.toLowerCase().includes(query) || (n.content || '').toLowerCase().includes(query))
+                : notes;
+
+            matchingNotes.forEach((note) => {
+                const realIndex = notes.indexOf(note);
+                const card = document.createElement('div');
+                card.className = 'note-card';
+                card.innerHTML = `
+                    <div onclick="openAddNoteModal(${realIndex})" style="cursor:pointer;">
+                        <div class="note-card-title">${note.title}</div>
+                        ${note.content ? `<div class="note-card-content">${note.content}</div>` : ''}
+                    </div>
+                    <div class="note-card-footer">
+                        <span>Note</span>
+                        <button class="note-card-delete" onclick="event.stopPropagation(); deleteNote(${realIndex})">&times;</button>
+                    </div>
+                `;
+                container.appendChild(card);
+                cardsAdded++;
+            });
+        }
+
+        // Future Plan cards (blended into the same grid, click to edit)
+        if (notesFilter === 'all' || notesFilter === 'plans') {
+            const matchingPlans = query
+                ? plans.filter(p => p.title.toLowerCase().includes(query) || (p.note || '').toLowerCase().includes(query))
+                : plans;
+
+            matchingPlans.forEach((plan) => {
+                const realIndex = plans.indexOf(plan);
+                const card = document.createElement('div');
+                card.className = 'note-card';
+                card.innerHTML = `
+                    <div onclick="openAddNotesPlanModal(${realIndex})" style="cursor:pointer;">
+                        <div class="note-card-title">${plan.title}</div>
+                        ${plan.note ? `<div class="note-card-content">${plan.note}</div>` : ''}
+                    </div>
+                    <div class="note-card-footer">
+                        <span>Plan</span>
+                        <button class="note-card-delete" onclick="event.stopPropagation(); deleteNotesPlan(${realIndex})">&times;</button>
+                    </div>
+                `;
+                container.appendChild(card);
+                cardsAdded++;
+            });
+        }
+
+        if (cardsAdded === 0) {
+            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">Nothing here yet.</div>';
+        }
     }
 
-    function openAddNoteModal() {
-        document.getElementById('note-title-input').value = '';
-        document.getElementById('note-content-input').value = '';
+    let editingNoteIndex = null;
+
+    function openAddNoteModal(index) {
+        const isEdit = typeof index === 'number';
+        editingNoteIndex = isEdit ? index : null;
+
+        const note = isEdit ? appData.notes[index] : null;
+        document.getElementById('note-title-input').value = note ? note.title : '';
+        document.getElementById('note-content-input').value = note ? note.content : '';
+        document.getElementById('note-modal-title').textContent = isEdit ? 'Edit Note' : 'New Note';
+        document.getElementById('note-modal-save-btn').textContent = isEdit ? 'Update Note' : 'Save Note';
         document.getElementById('note-modal').classList.add('open');
     }
 
@@ -2013,45 +2631,23 @@
 
         if (title) {
             if (!appData.notes) appData.notes = [];
-            appData.notes.unshift({ id: Date.now(), title, content });
+            if (editingNoteIndex !== null) {
+                const existing = appData.notes[editingNoteIndex];
+                appData.notes[editingNoteIndex] = { id: existing.id, title, content };
+            } else {
+                appData.notes.unshift({ id: Date.now(), title, content });
+            }
             saveData(appData);
-            renderNotesList();
+            renderNotesGrid();
             closeModal('note-modal');
+            editingNoteIndex = null;
         }
     }
 
     function deleteNote(index) {
         appData.notes.splice(index, 1);
         saveData(appData);
-        renderNotesList();
-    }
-
-    /* Notes Page: Independent To-Do List */
-    function renderNotesTodos() {
-        const container = document.getElementById('notes-todo-list');
-        if (!container) return;
-        container.innerHTML = '';
-
-        const todos = appData.notesTodos || [];
-        if (todos.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No to-do items yet.</div>';
-            return;
-        }
-
-        todos.forEach((todo, index) => {
-            const div = document.createElement('div');
-            div.className = 'task-item' + (todo.completed ? ' completed' : '');
-            div.innerHTML = `
-                <div class="task-left">
-                    <div class="task-checkbox" onclick="toggleNotesTodo(${index})"></div>
-                    <div class="task-content">
-                        <span class="task-title">${todo.title}</span>
-                    </div>
-                </div>
-                <button class="task-delete" onclick="deleteNotesTodo(${index})">&times;</button>
-            `;
-            container.appendChild(div);
-        });
+        renderNotesGrid();
     }
 
     function openAddNotesTodoModal() {
@@ -2066,7 +2662,7 @@
             if (!appData.notesTodos) appData.notesTodos = [];
             appData.notesTodos.unshift({ id: Date.now(), title, completed: false });
             saveData(appData);
-            renderNotesTodos();
+            renderNotesGrid();
             closeModal('notes-todo-modal');
         }
     }
@@ -2074,44 +2670,25 @@
     function toggleNotesTodo(index) {
         appData.notesTodos[index].completed = !appData.notesTodos[index].completed;
         saveData(appData);
-        renderNotesTodos();
+        renderNotesGrid();
     }
 
     function deleteNotesTodo(index) {
         appData.notesTodos.splice(index, 1);
         saveData(appData);
-        renderNotesTodos();
+        renderNotesGrid();
     }
 
-    /* Notes Page: Independent Future Plans */
-    function renderNotesPlans() {
-        const container = document.getElementById('notes-plan-list');
-        if (!container) return;
-        container.innerHTML = '';
+    /* Notes Page: Future Plans (blended into the notes grid, editable) */
+    let editingPlanIndex = null;
 
-        const plans = appData.notesFuturePlans || [];
-        if (plans.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-accent); font-size:13px;">No future plans added yet.</div>';
-            return;
-        }
+    function openAddNotesPlanModal(index) {
+        const isEdit = typeof index === 'number';
+        editingPlanIndex = isEdit ? index : null;
 
-        plans.forEach((plan, index) => {
-            const div = document.createElement('div');
-            div.className = 'plan-item';
-            div.innerHTML = `
-                <div style="flex-grow:1;">
-                    <div class="plan-item-name">${plan.title}</div>
-                    ${plan.note ? `<div style="font-size:11px; color:var(--text-accent); margin-top:2px;">${plan.note}</div>` : ''}
-                </div>
-                <button class="schedule-delete" onclick="deleteNotesPlan(${index})">&times;</button>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function openAddNotesPlanModal() {
-        document.getElementById('notes-plan-title-input').value = '';
-        document.getElementById('notes-plan-note-input').value = '';
+        const plan = isEdit ? appData.notesFuturePlans[index] : null;
+        document.getElementById('notes-plan-title-input').value = plan ? plan.title : '';
+        document.getElementById('notes-plan-note-input').value = plan ? plan.note : '';
         document.getElementById('notes-plan-modal').classList.add('open');
     }
 
@@ -2121,17 +2698,23 @@
 
         if (title) {
             if (!appData.notesFuturePlans) appData.notesFuturePlans = [];
-            appData.notesFuturePlans.unshift({ id: Date.now(), title, note });
+            if (editingPlanIndex !== null) {
+                const existing = appData.notesFuturePlans[editingPlanIndex];
+                appData.notesFuturePlans[editingPlanIndex] = { id: existing.id, title, note };
+            } else {
+                appData.notesFuturePlans.unshift({ id: Date.now(), title, note });
+            }
             saveData(appData);
-            renderNotesPlans();
+            renderNotesGrid();
             closeModal('notes-plan-modal');
+            editingPlanIndex = null;
         }
     }
 
     function deleteNotesPlan(index) {
         appData.notesFuturePlans.splice(index, 1);
         saveData(appData);
-        renderNotesPlans();
+        renderNotesGrid();
     }
 
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -2191,11 +2774,11 @@
         renderCalendar();
         renderSchedule();
         renderTasks();
+        renderRoutine();
+        updateStreakFromRoutine();
         renderFuturePurchases();
         renderCategorizedBudget();
-        renderNotesList();
-        renderNotesTodos();
-        renderNotesPlans();
+        renderNotesGrid();
         checkAuth();
         updateSyncBadge();
 
